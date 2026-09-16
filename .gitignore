@@ -1,0 +1,22 @@
+# Produtos operacionais e estado local
+/static/data/
+/static/version.json
+/static/egeon/
+/static/jaci/
+/static/tmp/
+/work/
+/outputs/
+/releases/
+*.zip
+*.log
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env
+.env.*
+!.env.example
+.codex/
+.agents/
+.DS_Store

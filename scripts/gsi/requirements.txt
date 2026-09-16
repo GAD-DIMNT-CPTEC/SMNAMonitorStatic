@@ -1,0 +1,4 @@
+# Static plot generation; gsi_parser.py has no external dependencies.
+matplotlib>=3.8,<4
+numpy>=1.24
+pillow>=10
