@@ -25,7 +25,7 @@ SMNAMonitorStatic-unificado/
 
 Abra ABRIR_SITE.html para visualizar os diagnósticos locais. Extraia todo o ZIP. As outras abas precisam de acesso ao servidor CPTEC. A alternativa HTTP é `python3 -m http.server 8000 --directory static` e acesso a http://localhost:8000/#gsi.
 
-O seletor Ambiente troca índices, ciclos, tabelas, galeria e downloads sem navegar para outra página. Os carregamentos locais são identificados por ambiente e ciclo; respostas antigas de uma troca rápida são descartadas. O botão Atualizar disponibilidade relê o índice GSI do ambiente selecionado. Campos Meteorológicos continua mostrando somente SMNA-FN.
+O seletor Ambiente troca índices, ciclos, tabelas, galeria e downloads sem navegar para outra página. Os carregamentos locais são identificados por ambiente e ciclo; respostas antigas de uma troca rápida são descartadas. O botão Atualizar disponibilidade relê o índice GSI do ambiente selecionado. Campos Meteorológicos continua mostrando somente SMNA-FNCEP.
 
 ## Migração local e hospedagem futura
 
@@ -35,13 +35,13 @@ Quando decidir publicar, o conteúdo de static/ corresponde diretamente ao diret
 
 ## Configuração e compatibilidade das fontes
 
-config.js contém os IDs smna-fn e smna-fc, os rótulos SMNA-FN e SMNA-FC e os caminhos gsiRoot para cada conjunto. Os nomes antigos foram retirados dos seletores e textos correntes da interface.
+config.js contém os IDs smna-fn e smna-fc, os rótulos SMNA-FNCEP e SMNA-FINPE e os caminhos gsiRoot para cada conjunto. Os nomes antigos foram retirados dos seletores e textos correntes da interface.
 
 O campo sourceKey é um alias técnico dos diretórios já existentes no servidor de origem para Status, Logs, Inventário e imagens meteorológicas. Ele não aparece como nome de ambiente na interface. Esses aliases foram mantidos em um único ponto para não quebrar URLs externas; trocar o nome da interface não renomeia as fontes remotas. Se os diretórios de origem forem reorganizados, altere somente sourceKey em config.js.
 
 ## Revisão dos scripts modificados manualmente
 
-As duas versões anteriores diferiam nos nomes fixos do ambiente e nos identificadores das execuções. Agora operational.py exige --environment SMNA-FN ou --environment SMNA-FC. O nome é usado no índice, nos identificadores e na impressão digital do cache. Isso evita reutilizar silenciosamente a extração de outro ambiente. Use diretórios de auditoria e saída diferentes para os dois conjuntos.
+As duas versões anteriores diferiam nos nomes fixos do ambiente e nos identificadores das execuções. Agora operational.py exige --environment SMNA-FNCEP ou --environment SMNA-FINPE. O nome é usado no índice, nos identificadores e na impressão digital do cache. Isso evita reutilizar silenciosamente a extração de outro ambiente. Use diretórios de auditoria e saída diferentes para os dois conjuntos.
 
 plot_operational.py lê o ambiente do index.json e rejeita índices sem um dos dois nomes válidos. O mesmo nome é passado aos títulos do histórico, resumo e galeria. Não existem versões separadas dos scripts por ambiente. prepare_local.py gera carregadores separados por ambiente, permitindo abrir o mesmo ciclo de dois conjuntos sem colisão.
 
@@ -54,12 +54,12 @@ python3 -m venv .venv
 .venv/bin/pip install -r scripts/gsi/requirements.txt
 ```
 
-Exemplo para SMNA-FN, a partir da raiz do projeto (no cron, use caminhos absolutos):
+Exemplo para SMNA-FNCEP, a partir da raiz do projeto (no cron, use caminhos absolutos):
 
 ```bash
 umask 022
 .venv/bin/python scripts/gsi/operational.py \
-  --environment SMNA-FN \
+  --environment SMNA-FNCEP \
   --input /CAMINHO/DOS/LOGS/FN \
   --output static/data/smna-fn \
   --audit work/estado/smna-fn/gsi-audit --workers 4
@@ -70,13 +70,13 @@ umask 022
 .venv/bin/python scripts/gsi/prepare_local.py --data static/data/smna-fn
 ```
 
-Para SMNA-FC, use --environment SMNA-FC, a entrada de logs correspondente e saída/auditoria em smna-fc. AAAAMMDDHH é um marcador a substituir, não uma data literal. Se não houver ciclos novos ou alterados, pule a geração. Sem --cycles, o gerador considera todo o índice; o histórico é atualizado mesmo com --cycles. A mudança dos scripts pode invalidar o cache de imagens por horário: escolha os ciclos explicitamente se quiser preservar as figuras históricas.
+Para SMNA-FINPE, use --environment SMNA-FINPE, a entrada de logs correspondente e saída/auditoria em smna-fc. AAAAMMDDHH é um marcador a substituir, não uma data literal. Se não houver ciclos novos ou alterados, pule a geração. Sem --cycles, o gerador considera todo o índice; o histórico é atualizado mesmo com --cycles. A mudança dos scripts pode invalidar o cache de imagens por horário: escolha os ciclos explicitamente se quiser preservar as figuras históricas.
 
 O novo identificador de versão e o ambiente no fingerprint invalidam o cache antigo na primeira execução. Isso pode reler os logs uma vez, mas não gera figuras automaticamente. Não use --refresh rotineiramente. --limit restringe o índice produzido e não deve ser usado como atualização incremental. O código 2 do exportador informa ciclos com erro; não publique automaticamente uma extração não revisada. O parser ainda não exige marcador de término: o cron deve controlar ciclos em execução. Evite execuções simultâneas e gere os produtos em trabalho antes de publicar uma versão concluída.
 
 ## Cobertura e integridade desta entrega
 
-SMNA-FN tem 478 ciclos interpretados, com último ciclo válido 2026091600. SMNA-FC tem 336, com último ciclo válido 2026081112. Os erros presentes nos índices foram preservados; reorganizar a interface não recupera logs ausentes.
+SMNA-FNCEP tem 478 ciclos interpretados, com último ciclo válido 2026091600. SMNA-FINPE tem 336, com último ciclo válido 2026081112. Os erros presentes nos índices foram preservados; reorganizar a interface não recupera logs ausentes.
 
 Os 336 ciclos válidos comuns possuem tabelas numéricas idênticas nas duas cópias fornecidas. Isso foi conferido após descompressão dos JSONs e não é uma conclusão sobre a procedência científica: revise as entradas e os caches utilizados pelo cron antes de tratar os conjuntos como execuções distintas. Os dados não foram inventados nem corrigidos para criar diferenças.
 

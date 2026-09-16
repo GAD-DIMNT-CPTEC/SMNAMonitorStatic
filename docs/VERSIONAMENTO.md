@@ -3,7 +3,7 @@
 ## Fluxo de trabalho
 
 1. Trabalhe em um clone deste repositório. Para alterações compartilhadas, crie uma branch, faça commit, envie e abra um pull request.
-2. Valide a interface com os dados locais ignorados pelo Git. Confira SMNA-FN e SMNA-FC, imagens, tabelas e downloads.
+2. Valide a interface com os dados locais ignorados pelo Git. Confira SMNA-FNCEP e SMNA-FINPE, imagens, tabelas e downloads.
 3. Atualize o clone usado para preparar entregas com `git pull --ff-only`. Não mantenha modificações avulsas na pasta servida.
 4. Exporte o commit aprovado: `python3 scripts/export_site.py --output /CAMINHO/ENTREGA`. O exportador aceita `--ref COMMIT_OU_TAG`; por padrão usa HEAD. Mudanças não commitadas não entram na exportação. Um arquivo já existente em ENTREGA só é substituído com `--overwrite`.
 5. Confira `ENTREGA/version.json`. Seu campo `commit` identifica o código e `files` contém SHA-256 dos arquivos. A revisão dos resultados científicos é separada da versão do frontend.
@@ -43,3 +43,9 @@ O cron deve usar scripts de uma revisão conhecida do mesmo repositório, com sa
 ## Dados fora do Git
 
 Copie os produtos atuais para static/data/smna-fn/ e static/data/smna-fc/ ou gere-os com os parsers. Não use git add -f para versionar logs, imagens ou auditorias. Os hashes da exportação cobrem somente os arquivos da interface, não os produtos operacionais.
+
+## Nomes e identificação da página
+
+A interface usa SMNA-FNCEP e SMNA-FINPE. Os IDs/pastas `smna-fn` e `smna-fc` permanecem estáveis para preservar as instalações e o cron. Os nomes anteriores são aceitos como aliases de entrada pelos parsers e para leitura dos índices, mas novas exportações e figuras usam os nomes atuais. Imagens históricas não são regeneradas automaticamente: texto gravado nelas pode manter a nomenclatura anterior.
+
+O rodapé mostra a versão `2026.09.16.1`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.

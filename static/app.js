@@ -2,7 +2,7 @@
 const BASE = 'https://dataserver.cptec.inpe.br/dataserver_dimnt/das/carlos.bastarz/sandbox/SMNAMonitoringApp/cron_scripts/';
 const $ = id => document.getElementById(id);
 const sourceKey=()=>window.SMNA_CONFIG.environments[$('environment').value].sourceKey;
-const products = [{environment:window.SMNA_CONFIG.environments['smna-fn'].sourceKey,name:'SMNA',label:'SMNA-FN'}];
+const products = [{environment:window.SMNA_CONFIG.environments['smna-fn'].sourceKey,name:'SMNA',label:'SMNA-FNCEP'}];
 const selectors = ['date', 'variable', 'level', 'forecast'];
 const cache = new Map();
 let revision = 0, view = 'status';
@@ -233,7 +233,7 @@ function drawObservations(){
 }
 function observationCSV(){return [observationHeaders(),...obsFiltered.map(observationCells)].map(row=>row.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\r\n');}
 function update(){
- $('env-label').textContent=view==='maps'?'SMNA-FN':$('environment').selectedOptions[0].text;
+ $('env-label').textContent=view==='maps'?'SMNA-FNCEP':$('environment').selectedOptions[0].text;
  if(view==='gsi'){++revision;notice('');window.loadGSIDiagnostics();}else if(view==='maps')loadMaps();else if(view==='status')loadStatus();else if(view==='logs')loadLogs();else if(view==='obs')loadObservations();else {++revision;notice('');}
 }
 function switchView(next){
@@ -244,7 +244,7 @@ function switchView(next){
  }
  $('map-controls').hidden=next!=='maps';$('log-controls').hidden=next!=='logs';$('obs-controls').hidden=next!=='obs';$('gsi-controls').hidden=next!=='gsi';
  document.querySelector('.parameters').hidden=next==='about';$('environment').hidden=next==='maps';document.querySelector('label[for="environment"]').hidden=next==='maps';$('refresh').hidden=false;$('env-label').hidden=next==='about';
- const titles={gsi:['Diagnósticos GSI','Minimização, observações e desempenho por ciclo de análise.'],maps:['Campos Meteorológicos','Campos meteorológicos do SMNA no SMNA-FN.'],status:['Status Operacional','Acompanhamento das etapas GSI, PRE, MODEL e POS.'],logs:['Logs Completos','Logs completos das etapas de execução.'],obs:['Inventário Observações','Inventário dos arquivos de observações.'],about:['Sobre','Sistema de Monitoramento da Assimilação de Dados · CPTEC/INPE']};
+ const titles={gsi:['Diagnósticos GSI','Minimização, observações e desempenho por ciclo de análise.'],maps:['Campos Meteorológicos','Campos meteorológicos do SMNA no SMNA-FNCEP.'],status:['Status Operacional','Acompanhamento das etapas GSI, PRE, MODEL e POS.'],logs:['Logs Completos','Logs completos das etapas de execução.'],obs:['Inventário Observações','Inventário dos arquivos de observações.'],about:['Sobre','Sistema de Monitoramento da Assimilação de Dados · CPTEC/INPE']};
  document.querySelector('.source').hidden=next==='gsi';$('title').textContent=titles[next][0];$('subtitle').textContent=titles[next][1];update();
 }
 $('tab-maps').addEventListener('click',()=>switchView('maps'));

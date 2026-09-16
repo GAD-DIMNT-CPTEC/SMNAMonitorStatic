@@ -4,6 +4,7 @@ import argparse, gzip, hashlib, json, re, sys
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
+from environments import canonical_environment, STORAGE_IDS
 from gsi_parser import Run, VERSION, write_csv, valid_cycle
 
 EXPORT_VERSION = '1.3.0-env'
@@ -64,7 +65,7 @@ def process(p,a):
             d=load_json(dest);entry=old;entry['cached']=True
         else:
             stdout_name,selection=select_stdout(files)
-            run=Run(p,cycle=p.name,experiment=a.environment,run_id=a.environment.lower()+'_'+p.name,stdout_name=stdout_name).parse()
+            run=Run(p,cycle=p.name,experiment=a.environment,run_id=STORAGE_IDS[a.environment]+'_'+p.name,stdout_name=stdout_name).parse()
             after=[(f.name,f.stat().st_size,f.stat().st_mtime_ns) for f in files]
             if stats!=after:raise ValueError('Files changed while reading; rerun after cycle finishes')
             d=summarize(run);d['summary'].update(selection);entry.update(fingerprint=fingerprint,cached=False,inventory=run.tables['inventory'],warnings=run.warnings,unparsed_by_file=d['unparsed_by_file'])
@@ -79,7 +80,7 @@ def process(p,a):
 
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('--environment',required=True,choices=['SMNA-FN','SMNA-FC'],help='Identidade do conjunto de dados; use saída e auditoria separadas por ambiente')
+    ap.add_argument('--environment',required=True,type=canonical_environment,choices=['SMNA-FNCEP','SMNA-FINPE'],help='Identidade do conjunto de dados; use saída e auditoria separadas por ambiente')
     ap.add_argument('--input',type=Path,required=True);ap.add_argument('--output',type=Path,required=True)
     ap.add_argument('--audit',type=Path,required=True);ap.add_argument('--refresh',action='store_true')
     ap.add_argument('--workers',type=int,default=4,choices=range(1,9),help='Bounded cycle workers (1–8)')

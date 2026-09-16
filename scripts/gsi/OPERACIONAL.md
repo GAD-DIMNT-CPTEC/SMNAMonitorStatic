@@ -11,7 +11,7 @@ Execute a partir da raiz do repositório; no cron, use caminhos absolutos:
 ```bash
 umask 022
 python3 scripts/gsi/operational.py \
-  --environment SMNA-FN \
+  --environment SMNA-FNCEP \
   --input /CAMINHO/LOGS/FN \
   --output static/data/smna-fn \
   --audit work/estado/smna-fn/gsi-audit --workers 4
@@ -21,7 +21,7 @@ python3 scripts/gsi/plot_operational.py --data static/data/smna-fn --cycles AAAA
 python3 scripts/gsi/prepare_local.py --data static/data/smna-fn
 ```
 
-Para SMNA-FC, troque o ambiente, a entrada e as pastas de saída/auditoria para smna-fc. Não compartilhe caches entre os ambientes. O índice precisa identificar SMNA-FN ou SMNA-FC. O exportador inclui o ambiente e as versões dos scripts no fingerprint; a primeira atualização após migração pode reler logs antigos. Isso não gera figuras automaticamente.
+Para SMNA-FINPE, troque o ambiente, a entrada e as pastas de saída/auditoria para smna-fc. Não compartilhe caches entre os ambientes. O índice precisa identificar SMNA-FNCEP ou SMNA-FINPE. O exportador inclui o ambiente e as versões dos scripts no fingerprint; a primeira atualização após migração pode reler logs antigos. Isso não gera figuras automaticamente.
 
 Sem `--cycles`, o gerador considera todos os ciclos; o cache de figuras depende das datas dos dados e scripts, portanto uma atualização de código pode provocar regeneração. O histórico é gerado mesmo com uma seleção de ciclos. `prepare_local.py` apenas empacota dados existentes e não gera figuras.
 

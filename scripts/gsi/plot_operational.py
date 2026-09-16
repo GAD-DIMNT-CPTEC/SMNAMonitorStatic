@@ -2,6 +2,7 @@
 """Render operational history and per-cycle PNG plots without a plotting server."""
 import argparse,json
 from operational import load_json
+from environments import canonical_environment
 from datetime import datetime
 from pathlib import Path
 import matplotlib
@@ -62,8 +63,8 @@ def draw(s,data,out,environment):
 
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--data',type=Path,required=True);ap.add_argument('--cycles',nargs='+',help='Regenerate plots for selected cycles; history remains complete');ap.add_argument('--available',action='store_true',help='Staging only: plot available cycle JSONs while extraction continues');a=ap.parse_args()
-    index=json.loads((a.data/'index.json').read_text());environment=index.get('environment');
-    if environment not in ('SMNA-FN','SMNA-FC'):ap.error('O índice precisa identificar environment como SMNA-FN ou SMNA-FC')
+    index=json.loads((a.data/'index.json').read_text());environment=canonical_environment(index.get('environment'));
+    if environment not in ('SMNA-FNCEP','SMNA-FINPE'):ap.error('O índice precisa identificar environment como SMNA-FNCEP ou SMNA-FINPE')
     out=a.data/'plots';out.mkdir(exist_ok=True)
     rows=([load_json(p)['summary'] for p in sorted((a.data/'cycles').glob('*.json.gz'))] if a.available else index['cycles']);valid=[s for s in rows if s['state']=='parsed']
     # Keep true time spacing and break missing-cycle gaps instead of connecting them.

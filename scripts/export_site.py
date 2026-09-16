@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import tempfile
@@ -36,6 +37,14 @@ def main():
         files[str(relative)] = git('cat-file', 'blob', oid)
     if 'index.html' not in files:
         parser.error('This revision has no static/index.html')
+    if 'version.js' in files:
+        version_script = files['version.js'].decode()
+        version_script = re.sub(r'commit: null', 'commit: '+json.dumps(commit), version_script, count=1)
+        files['version.js'] = version_script.encode()
+        # Give each committed delivery its own script/cache identity.
+        files['index.html'] = re.sub(
+            rb'((?:src|href)="(?:styles\.css|config\.js|app\.js|gsi\.js|version\.js)\?v=)[^"]+',
+            lambda match: match[1]+commit.encode(), files['index.html'])
     manifest = {'commit': commit, 'files': {name: hashlib.sha256(data).hexdigest()
                                            for name, data in sorted(files.items())}}
     files['version.json'] = (json.dumps(manifest, indent=2)+'\n').encode()

@@ -1,6 +1,6 @@
 # SMNAMonitorStatic
 
-Dashboard estática de monitoramento da assimilação de dados do CPTEC/INPE. Uma única página apresenta **SMNA-FN** e **SMNA-FC**, com dados separados e uma única cópia dos scripts de processamento.
+Dashboard estática de monitoramento da assimilação de dados do CPTEC/INPE. Uma única página apresenta **SMNA-FNCEP** e **SMNA-FINPE**, com dados separados e uma única cópia dos scripts de processamento.
 
 ## Organização
 
@@ -34,7 +34,7 @@ python3 -m venv .venv
 .venv/bin/python scripts/gsi/operational.py --help
 ```
 
-O exportador exige `--environment SMNA-FN` ou `--environment SMNA-FC`, com entrada, saída e cache separados. O gerador obtém o nome do ambiente no índice. Veja [operação](scripts/gsi/OPERACIONAL.md) e o [dicionário de dados](scripts/gsi/DATA_DICTIONARY.md).
+O exportador exige `--environment SMNA-FNCEP` ou `--environment SMNA-FINPE`, com entrada, saída e cache separados. O gerador obtém o nome do ambiente no índice. Veja [operação](scripts/gsi/OPERACIONAL.md) e o [dicionário de dados](scripts/gsi/DATA_DICTIONARY.md).
 
 ## Manter a versão local e a instalada alinhadas
 
@@ -48,3 +48,9 @@ python3 scripts/export_site.py --output /CAMINHO/DA/ENTREGA
 Use uma pasta de entrega separada do clone e do servidor. A instalação dessa entrega é manual; veja [versionamento e atualização](docs/VERSIONAMENTO.md). Não há workflow de deploy nem agendamento instalado pelo repositório.
 
 A documentação da interpretação científica também está na aba **Sobre**. O [guia de migração](docs/MIGRACAO.md) registra a consolidação das duas cópias anteriores, suas limitações e a cobertura do pacote local que originou este código.
+
+## Nomes e identificação da página
+
+A interface usa SMNA-FNCEP e SMNA-FINPE. Os IDs/pastas `smna-fn` e `smna-fc` permanecem estáveis para preservar as instalações e o cron. Os nomes anteriores são aceitos como aliases de entrada pelos parsers e para leitura dos índices, mas novas exportações e figuras usam os nomes atuais. Imagens históricas não são regeneradas automaticamente: texto gravado nelas pode manter a nomenclatura anterior.
+
+O rodapé mostra a versão `2026.09.16.1`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.

@@ -2,7 +2,7 @@
 window.SMNA_CONFIG = {
   defaultEnvironment: 'smna-fn',
   environments: {
-    'smna-fn': {label: 'SMNA-FN', gsiRoot: 'data/smna-fn/', sourceKey: 'egeon'},
-    'smna-fc': {label: 'SMNA-FC', gsiRoot: 'data/smna-fc/', sourceKey: 'xc50'}
+    'smna-fn': {label: 'SMNA-FNCEP', aliases: ['SMNA-FN'], gsiRoot: 'data/smna-fn/', sourceKey: 'egeon'},
+    'smna-fc': {label: 'SMNA-FINPE', aliases: ['SMNA-FC'], gsiRoot: 'data/smna-fc/', sourceKey: 'xc50'}
   }
 };

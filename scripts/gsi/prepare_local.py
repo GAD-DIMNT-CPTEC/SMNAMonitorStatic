@@ -2,11 +2,13 @@
 """Prepare file://-compatible GSI data without reading logs or regenerating figures."""
 import argparse,gzip,json
 from pathlib import Path
+from environments import canonical_environment, STORAGE_IDS
 
 def prepare(root):
     local=root/'local';local.mkdir(exist_ok=True)
     index=json.loads((root/'index.json').read_text())
-    key=index['environment'].lower()
+    index['environment']=canonical_environment(index['environment'])
+    key=STORAGE_IDS[index['environment']]
     if key not in ('smna-fn','smna-fc'):raise ValueError('Ambiente inválido no índice')
     prefix='window.SMNA_GSI_LOCAL=window.SMNA_GSI_LOCAL||{};window.SMNA_GSI_LOCAL['+json.dumps(key)+']=window.SMNA_GSI_LOCAL['+json.dumps(key)+']||{cycles:{}};'
     target='window.SMNA_GSI_LOCAL['+json.dumps(key)+']'
