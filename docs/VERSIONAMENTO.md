@@ -38,7 +38,7 @@ raise SystemExit(bool(bad))
 PYCODE
 ```
 
-O cron deve usar scripts de uma revisão conhecida do mesmo repositório, com saída e auditoria independentes por ambiente. Atualizar o repositório não executa o parser e não altera automaticamente a página pública.
+O cron deve usar scripts de uma revisão conhecida do mesmo repositório, com saída e auditoria independentes por ambiente. Atualizar o repositório não executa o parser nem instala arquivos no dataserver. Alterações do frontend enviadas para main acionam a publicação no GitHub Pages.
 
 ## Dados fora do Git
 
@@ -55,3 +55,13 @@ O rodapé mostra a versão `2026.09.17.3`. Em uma cópia direta do código, essa
 A origem HTTP(S) permanece no CPTEC em SMNAMonitoringApp/online/static/data/, mas os diagnósticos passam a usar exclusivamente smna-fncep/ e smna-finpe/. As pastas antigas smna-fn/ e smna-fc/ não são apagadas nem usadas como fallback. Cada índice determina a cobertura apresentada; não há fusão automática do histórico antigo com os novos resultados.
 
 Por file://, copie os novos conjuntos para static/data/smna-fncep/ e static/data/smna-finpe/ e execute prepare_local.py nessas pastas. O script continua produzindo os IDs internos compatíveis com o seletor. Não é necessário alterar nomes de arquivos das figuras ou executar novamente o parser para aplicar a mudança dos caminhos da página.
+
+## Publicação no GitHub Pages
+
+O workflow `.github/workflows/pages.yml` usa o mesmo `scripts/export_site.py` das entregas manuais. Ele publica somente a interface, sem `static/data/`, com o hash do commit e o manifesto de integridade. A configuração do repositório em **Settings → Pages → Source** deve ser **GitHub Actions**.
+
+Pushes em main que alteram a interface, o exportador ou o workflow disparam o deploy; alterações apenas de documentação não disparam. Para republicar, execute **Actions → Publish GitHub Pages → Run workflow** na branch main. Confira o resultado da execução e o `version.json` no endereço publicado. Para uma reversão, reverta o commit da interface na main e aguarde o workflow.
+
+O endereço alternativo é https://gad-dimnt-cptec.github.io/SMNAMonitorStatic/. Para manter o dataserver na mesma revisão, exporte o commit indicado no Pages com `--ref COMMIT` e instale a entrega manualmente pelo procedimento acima. O workflow nunca acessa nem modifica a instalação no dataserver.
+
+Os dados continuam externos, na origem operacional atual. O Pages não oferece cópia de contingência das figuras ou tabelas; a disponibilidade dos produtos e a liberação de CORS no dataserver continuam necessárias. Não foram incluídos resultados históricos locais como substitutos dos dados atuais.

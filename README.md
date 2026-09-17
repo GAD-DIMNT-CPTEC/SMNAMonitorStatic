@@ -45,7 +45,7 @@ git pull --ff-only
 python3 scripts/export_site.py --output /CAMINHO/DA/ENTREGA
 ```
 
-Use uma pasta de entrega separada do clone e do servidor. A instalação dessa entrega é manual; veja [versionamento e atualização](docs/VERSIONAMENTO.md). Não há workflow de deploy nem agendamento instalado pelo repositório.
+Use uma pasta de entrega separada do clone e do servidor. A instalação dessa entrega no dataserver é manual; veja [versionamento e atualização](docs/VERSIONAMENTO.md). O GitHub Pages é atualizado pelo workflow descrito abaixo. O repositório não instala agendamento de processamento.
 
 A documentação da interpretação científica também está na aba **Sobre**. O [guia de migração](docs/MIGRACAO.md) registra a consolidação das duas cópias anteriores, suas limitações e a cobertura do pacote local que originou este código.
 
@@ -78,3 +78,13 @@ Na verificação desta correção, os dois novos CSVs retornavam HTTP 403. Além
 `inventoryKey` seleciona `cron_scripts/obsm/smna-fncep/mon_rec_obs_final.csv` ou `cron_scripts/obsm/smna-finpe/mon_rec_obs_final.csv`. O botão “Abrir CSV de origem” permite conferir o arquivo realmente consultado; o download filtrado continua disponível separadamente. A normalização dos registros, as unidades e os filtros não mudaram. Não há fallback para os inventários antigos.
 
 Na verificação desta correção, ambos os CSVs novos retornavam HTTP 403. Verifique no host a permissão de travessia dos diretórios (755) e de leitura dos CSVs públicos (644). Atualizar o código não altera as permissões do servidor.
+
+## GitHub Pages — interface alternativa
+
+Endereço: https://gad-dimnt-cptec.github.io/SMNAMonitorStatic/
+
+O workflow `.github/workflows/pages.yml` exporta o frontend do commit e publica no Pages. Ele executa quando há alterações em `static/`, no exportador ou no próprio workflow na branch `main`. Também pode ser executado manualmente em **Actions → Publish GitHub Pages → Run workflow**, escolhendo `main`. O rodapé e `version.json` identificam o commit publicado.
+
+Esta hospedagem mantém a interface disponível em outro provedor, mas **não espelha os dados operacionais**. Imagens, JSONs e CSVs continuam nos endereços atuais do dataserver. Durante uma indisponibilidade desse servidor, as consultas não carregarão. Quando ele retornar, recarregue a página. O servidor precisa permitir CORS para leitura dos dados pelo domínio do Pages.
+
+A publicação não modifica o dataserver, os parsers, o cron ou as figuras. A mesma exportação funciona na pasta atual do dataserver e no subdiretório do GitHub Pages, pois os recursos da interface usam caminhos relativos e as fontes operacionais usam URLs absolutas. Para ter também os resultados disponíveis durante uma queda, será necessário manter um espelho atualizado dos produtos em uma origem independente.

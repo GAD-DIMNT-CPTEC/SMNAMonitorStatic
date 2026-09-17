@@ -20,3 +20,6 @@ __pycache__/
 .codex/
 .agents/
 .DS_Store
+
+# GitHub Pages artifact
+/_site/
