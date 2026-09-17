@@ -2,6 +2,7 @@
 const BASE = 'https://dataserver.cptec.inpe.br/dataserver_dimnt/das/carlos.bastarz/sandbox/SMNAMonitoringApp/cron_scripts/';
 const $ = id => document.getElementById(id);
 const sourceKey=()=>window.SMNA_CONFIG.environments[$('environment').value].sourceKey;
+const logsKey=()=>window.SMNA_CONFIG.environments[$('environment').value].logsKey;
 const products = [{environment:window.SMNA_CONFIG.environments['smna-fn'].sourceKey,name:'SMNA',label:'SMNA-FNCEP'}];
 const selectors = ['date', 'variable', 'level', 'forecast'];
 const cache = new Map();
@@ -94,7 +95,7 @@ function parseCSV(text){
 }
 function statusLogURL(value,environment,header){
  // Rebuild known log links from the current environment; never insert CSV HTML.
- if(!/^Action (GSI|PRE|MODEL|POS)$/.test(header)||!Object.values(window.SMNA_CONFIG.environments).some(e=>e.sourceKey===environment))return null;
+ if(!/^Action (GSI|PRE|MODEL|POS)$/.test(header)||!Object.values(window.SMNA_CONFIG.environments).some(e=>e.logsKey===environment))return null;
  const m=value.match(/<a\b[^>]*\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))[^>]*>\s*CHECK LOGS\s*<\/a>/i);
  if(!m)return null;
  try{
@@ -107,10 +108,11 @@ function statusLogURL(value,environment,header){
  }catch{return null;}
 }
 async function loadStatus(){
- const ticket=++revision,env=sourceKey();
+ const ticket=++revision,env=logsKey();
  $('status-table').replaceChildren();$('table-meta').textContent='';$('csv-link').hidden=true;notice('Consultando status operacional…');
  try{
-  const source=`logs/${env}/logs.csv`,{text,modified}=await resource(source);
+  const source=`logs/${env}/logs.csv`;$('csv-link').href=BASE+source;$('csv-link').hidden=false;
+  const {text,modified}=await resource(source);
   if(ticket!==revision)return;
   const [headers,...rows]=parseCSV(text);
   if(!headers?.includes('Current Date')||!headers.includes('Last Operational Run'))throw new Error('Formato inesperado');
@@ -125,13 +127,13 @@ async function loadStatus(){
   const parsed=latest?Date.parse(latest.replace(/^(\d{4}-\d{2}-\d{2})-(\d{2}:\d{2})$/,'$1T$2:00Z')):NaN;
   const old=Number.isFinite(parsed)&&Date.now()-parsed>36*3600000;
   notice(rows.length?`${old?'Dados antigos: ':''}último registro publicado em ${latest}. Horários em UTC.`:'Nenhum registro publicado.',old);
- }catch(e){if(ticket!==revision)return;notice('Não foi possível carregar a tabela. Use “Atualizar disponibilidade” para tentar novamente.',true);}
+ }catch(e){if(ticket!==revision)return;notice('Não foi possível carregar o CSV de status deste ambiente. '+e.message+' Use “Abrir CSV” para conferir a origem.',true);}
 }
 let logStage='gsi', logFiles={}, logBlob=null, obsData=[], obsFiltered=[], obsPage=0;
 const PAGE_SIZE=100;
 function fileDownload(text,name){const url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 async function loadLogs(){
- const ticket=++revision,env=sourceKey();
+ const ticket=++revision,env=logsKey();
  $('log-date').disabled=true;$('log-file').disabled=true;$('log-content').textContent='';$('log-download').hidden=true;$('log-meta').textContent='';notice('Consultando os ciclos disponíveis…');
  logFiles={};
  document.querySelectorAll('[data-stage]').forEach(b=>b.disabled=true);
@@ -161,7 +163,7 @@ async function loadLogFile(){
  if(!file){notice('Nenhum log desta etapa foi publicado para o ciclo selecionado.');return;}
  notice(`Carregando ${logStage.toUpperCase()}…`);
  try{
-  const {text}=await resource(`logs/${sourceKey()}/${logStage}/${file}`);
+  const {text}=await resource(`logs/${logsKey()}/${logStage}/${file}`);
   if(ticket!==revision)return;
   $('log-content').textContent=text||'Arquivo vazio.';$('log-content').scrollTop=0;
   $('log-meta').textContent=`${file} · ${new Intl.NumberFormat('pt-BR').format(text?text.split('\n').length:0)} linhas`;

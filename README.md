@@ -53,7 +53,7 @@ A documentação da interpretação científica também está na aba **Sobre**. 
 
 A interface usa SMNA-FNCEP e SMNA-FINPE. Os IDs internos do seletor e dos carregadores locais continuam `smna-fn` e `smna-fc`. As pastas dos produtos agora são `smna-fncep/` e `smna-finpe/`; os nomes das pastas não precisam coincidir com esses IDs. Atualize os caminhos de saída do cron conforme a organização dos produtos. Os nomes anteriores são aceitos como aliases de entrada pelos parsers e para leitura dos índices, mas novas exportações e figuras usam os nomes atuais. Imagens históricas não são regeneradas automaticamente: texto gravado nelas pode manter a nomenclatura anterior.
 
-O rodapé mostra a versão `2026.09.17.1`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
+O rodapé mostra a versão `2026.09.17.2`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
 
 ## Origem operacional dos diagnósticos
 
@@ -66,3 +66,9 @@ https://dataserver.cptec.inpe.br/dataserver_dimnt/das/carlos.bastarz/sandbox/SMN
 Em HTTP(S), `GSI_BASE` em config.js usa esse endereço absoluto. Os dois ambientes apontam para suas subpastas smna-fncep/ e smna-finpe/; índices, dados de ciclos, imagens e downloads seguem a mesma origem. O cron existente pode continuar publicando lá. Não é necessário copiar dados para a nova página nem regenerar figuras. Para consultar produtos locais por HTTP, altere explicitamente GSI_BASE para `data/` na configuração de teste. Por file://, essa seleção local já é automática.
 
 Após atualizar o código no host, recarregue a página ignorando o cache. O index.html desta release renova os identificadores de cache dos recursos. O servidor de dados precisa manter acesso público e CORS para leitura dos JSONs a partir de outros domínios. A configuração MIME de WebP é independente: o Apache deve enviar Content-Type: image/webp para que “Abrir imagem original” funcione corretamente.
+
+## Origem do Status Operacional e Logs Completos
+
+A configuração separa `logsKey` de `sourceKey`: Status e Logs usam `cron_scripts/logs/smna-fncep/` e `cron_scripts/logs/smna-finpe/`; as imagens meteorológicas e o inventário continuam usando os aliases de suas fontes existentes. Não altere sourceKey para corrigir somente a tabela de status. O botão Abrir CSV aponta para a origem selecionada mesmo quando há erro, e o aviso exibe o código HTTP. Não há fallback para CSVs antigos de outro diretório.
+
+Na verificação desta correção, os dois novos CSVs retornavam HTTP 403. Além de atualizar o código, o operador deve permitir acesso aos diretórios de logs e leitura dos arquivos públicos no servidor (diretórios 755, arquivos 644). A correção da interface não modifica essas permissões.
