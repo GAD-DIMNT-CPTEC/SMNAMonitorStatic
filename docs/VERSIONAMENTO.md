@@ -42,10 +42,10 @@ O cron deve usar scripts de uma revisão conhecida do mesmo repositório, com sa
 
 ## Dados fora do Git
 
-Copie os produtos atuais para static/data/smna-fn/ e static/data/smna-fc/ ou gere-os com os parsers. Não use git add -f para versionar logs, imagens ou auditorias. Os hashes da exportação cobrem somente os arquivos da interface, não os produtos operacionais.
+A configuração HTTP(S) consulta os produtos operacionais no CPTEC, independentemente da pasta onde a interface é instalada. Para uso offline por file://, copie os produtos atuais para static/data/smna-fn/ e static/data/smna-fc/ ou gere-os com os parsers. Não use git add -f para versionar logs, imagens ou auditorias. Os hashes da exportação cobrem somente os arquivos da interface, não os produtos operacionais.
 
 ## Nomes e identificação da página
 
 A interface usa SMNA-FNCEP e SMNA-FINPE. Os IDs/pastas `smna-fn` e `smna-fc` permanecem estáveis para preservar as instalações e o cron. Os nomes anteriores são aceitos como aliases de entrada pelos parsers e para leitura dos índices, mas novas exportações e figuras usam os nomes atuais. Imagens históricas não são regeneradas automaticamente: texto gravado nelas pode manter a nomenclatura anterior.
 
-O rodapé mostra a versão `2026.09.16.1`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
+O rodapé mostra a versão `2026.09.16.2`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
