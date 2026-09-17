@@ -42,10 +42,16 @@ O cron deve usar scripts de uma revisão conhecida do mesmo repositório, com sa
 
 ## Dados fora do Git
 
-A configuração HTTP(S) consulta os produtos operacionais no CPTEC, independentemente da pasta onde a interface é instalada. Para uso offline por file://, copie os produtos atuais para static/data/smna-fn/ e static/data/smna-fc/ ou gere-os com os parsers. Não use git add -f para versionar logs, imagens ou auditorias. Os hashes da exportação cobrem somente os arquivos da interface, não os produtos operacionais.
+A configuração HTTP(S) consulta os produtos operacionais no CPTEC, independentemente da pasta onde a interface é instalada. Para uso offline por file://, copie os produtos atuais para static/data/smna-fncep/ e static/data/smna-finpe/ ou gere-os com os parsers. Não use git add -f para versionar logs, imagens ou auditorias. Os hashes da exportação cobrem somente os arquivos da interface, não os produtos operacionais.
 
 ## Nomes e identificação da página
 
-A interface usa SMNA-FNCEP e SMNA-FINPE. Os IDs/pastas `smna-fn` e `smna-fc` permanecem estáveis para preservar as instalações e o cron. Os nomes anteriores são aceitos como aliases de entrada pelos parsers e para leitura dos índices, mas novas exportações e figuras usam os nomes atuais. Imagens históricas não são regeneradas automaticamente: texto gravado nelas pode manter a nomenclatura anterior.
+A interface usa SMNA-FNCEP e SMNA-FINPE. Os IDs internos do seletor e dos carregadores locais continuam `smna-fn` e `smna-fc`. As pastas dos produtos agora são `smna-fncep/` e `smna-finpe/`; os nomes das pastas não precisam coincidir com esses IDs. Atualize os caminhos de saída do cron conforme a organização dos produtos. Os nomes anteriores são aceitos como aliases de entrada pelos parsers e para leitura dos índices, mas novas exportações e figuras usam os nomes atuais. Imagens históricas não são regeneradas automaticamente: texto gravado nelas pode manter a nomenclatura anterior.
 
-O rodapé mostra a versão `2026.09.16.2`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
+O rodapé mostra a versão `2026.09.17.1`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
+
+## Novas pastas operacionais — versão 2026.09.17.1
+
+A origem HTTP(S) permanece no CPTEC em SMNAMonitoringApp/online/static/data/, mas os diagnósticos passam a usar exclusivamente smna-fncep/ e smna-finpe/. As pastas antigas smna-fn/ e smna-fc/ não são apagadas nem usadas como fallback. Cada índice determina a cobertura apresentada; não há fusão automática do histórico antigo com os novos resultados.
+
+Por file://, copie os novos conjuntos para static/data/smna-fncep/ e static/data/smna-finpe/ e execute prepare_local.py nessas pastas. O script continua produzindo os IDs internos compatíveis com o seletor. Não é necessário alterar nomes de arquivos das figuras ou executar novamente o parser para aplicar a mudança dos caminhos da página.

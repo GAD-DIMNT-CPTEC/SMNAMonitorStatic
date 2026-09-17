@@ -10,7 +10,7 @@ Dashboard estática de monitoramento da assimilação de dados do CPTEC/INPE. Um
 - `scripts/export_site.py`: exporta a interface de um commit para uma pasta de entrega e registra sua versão.
 - `docs/`: operação, migração e versionamento.
 
-Os produtos de `static/data/smna-fn/` e `static/data/smna-fc/` são gerados pelo cron e **não fazem parte do Git**, assim como logs, auditorias e ambientes Python. O repositório não contém dados de exemplo ou resultados sintéticos. Por HTTP(S), os diagnósticos são carregados diretamente da origem operacional no CPTEC, configurada em `static/config.js`. O clone não precisa conter esses produtos para consultar a origem remota.
+Os produtos de `static/data/smna-fncep/` e `static/data/smna-finpe/` são gerados pelo cron e **não fazem parte do Git**, assim como logs, auditorias e ambientes Python. O repositório não contém dados de exemplo ou resultados sintéticos. Por HTTP(S), os diagnósticos são carregados diretamente da origem operacional no CPTEC, configurada em `static/config.js`. O clone não precisa conter esses produtos para consultar a origem remota.
 
 ## Abrir localmente
 
@@ -20,7 +20,7 @@ cd SMNAMonitorStatic
 python3 -m http.server 8000 --directory static
 ```
 
-Acesse http://localhost:8000/; por padrão, os diagnósticos consultam o CPTEC e precisam de internet. Para abertura direta por file://, coloque os conjuntos existentes em `static/data/smna-fn/` e `static/data/smna-fc/`. Cada pasta contém `index.json`, CSVs, `cycles/`, `plots/` e, opcionalmente, `local/`.
+Acesse http://localhost:8000/; por padrão, os diagnósticos consultam o CPTEC e precisam de internet. Para abertura direta por file://, coloque os conjuntos existentes em `static/data/smna-fncep/` e `static/data/smna-finpe/`. Cada pasta contém `index.json`, CSVs, `cycles/`, `plots/` e, opcionalmente, `local/`.
 
 Para abertura direta, execute `prepare_local.py` para cada ambiente e abra `ABRIR_SITE.html`. As demais abas consultam o servidor CPTEC e precisam de internet.
 
@@ -51,9 +51,9 @@ A documentação da interpretação científica também está na aba **Sobre**. 
 
 ## Nomes e identificação da página
 
-A interface usa SMNA-FNCEP e SMNA-FINPE. Os IDs/pastas `smna-fn` e `smna-fc` permanecem estáveis para preservar as instalações e o cron. Os nomes anteriores são aceitos como aliases de entrada pelos parsers e para leitura dos índices, mas novas exportações e figuras usam os nomes atuais. Imagens históricas não são regeneradas automaticamente: texto gravado nelas pode manter a nomenclatura anterior.
+A interface usa SMNA-FNCEP e SMNA-FINPE. Os IDs internos do seletor e dos carregadores locais continuam `smna-fn` e `smna-fc`. As pastas dos produtos agora são `smna-fncep/` e `smna-finpe/`; os nomes das pastas não precisam coincidir com esses IDs. Atualize os caminhos de saída do cron conforme a organização dos produtos. Os nomes anteriores são aceitos como aliases de entrada pelos parsers e para leitura dos índices, mas novas exportações e figuras usam os nomes atuais. Imagens históricas não são regeneradas automaticamente: texto gravado nelas pode manter a nomenclatura anterior.
 
-O rodapé mostra a versão `2026.09.16.2`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
+O rodapé mostra a versão `2026.09.17.1`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
 
 ## Origem operacional dos diagnósticos
 
@@ -63,6 +63,6 @@ A página pode ser instalada em `SMNAMonitorStatic/static/`, enquanto os dados c
 https://dataserver.cptec.inpe.br/dataserver_dimnt/das/carlos.bastarz/sandbox/SMNAMonitoringApp/online/static/data/
 ```
 
-Em HTTP(S), `GSI_BASE` em config.js usa esse endereço absoluto. Os dois ambientes apontam para suas subpastas smna-fn/ e smna-fc/; índices, dados de ciclos, imagens e downloads seguem a mesma origem. O cron existente pode continuar publicando lá. Não é necessário copiar dados para a nova página nem regenerar figuras. Para consultar produtos locais por HTTP, altere explicitamente GSI_BASE para `data/` na configuração de teste. Por file://, essa seleção local já é automática.
+Em HTTP(S), `GSI_BASE` em config.js usa esse endereço absoluto. Os dois ambientes apontam para suas subpastas smna-fncep/ e smna-finpe/; índices, dados de ciclos, imagens e downloads seguem a mesma origem. O cron existente pode continuar publicando lá. Não é necessário copiar dados para a nova página nem regenerar figuras. Para consultar produtos locais por HTTP, altere explicitamente GSI_BASE para `data/` na configuração de teste. Por file://, essa seleção local já é automática.
 
 Após atualizar o código no host, recarregue a página ignorando o cache. O index.html desta release renova os identificadores de cache dos recursos. O servidor de dados precisa manter acesso público e CORS para leitura dos JSONs a partir de outros domínios. A configuração MIME de WebP é independente: o Apache deve enviar Content-Type: image/webp para que “Abrir imagem original” funcione corretamente.

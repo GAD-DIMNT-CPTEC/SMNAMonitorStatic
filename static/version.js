@@ -1,5 +1,5 @@
 /* Source release; export_site.py replaces this with the exact exported commit. */
-window.SMNA_VERSION = {name: '2026.09.16.2', commit: null};
+window.SMNA_VERSION = {name: '2026.09.17.1', commit: null};
 document.addEventListener('DOMContentLoaded', () => {
   const target = document.getElementById('site-version');
   if (!target) return;
