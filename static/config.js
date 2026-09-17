@@ -7,7 +7,7 @@ const GSI_BASE = location.protocol === 'file:'
 window.SMNA_CONFIG = {
   defaultEnvironment: 'smna-fn',
   environments: {
-    'smna-fn': {label: 'SMNA-FNCEP', aliases: ['SMNA-FN'], gsiRoot: GSI_BASE + 'smna-fncep/', sourceKey: 'egeon', logsKey: 'smna-fncep'},
-    'smna-fc': {label: 'SMNA-FINPE', aliases: ['SMNA-FC'], gsiRoot: GSI_BASE + 'smna-finpe/', sourceKey: 'xc50', logsKey: 'smna-finpe'}
+    'smna-fn': {label: 'SMNA-FNCEP', aliases: ['SMNA-FN'], gsiRoot: GSI_BASE + 'smna-fncep/', sourceKey: 'egeon', logsKey: 'smna-fncep', inventoryKey: 'smna-fncep'},
+    'smna-fc': {label: 'SMNA-FINPE', aliases: ['SMNA-FC'], gsiRoot: GSI_BASE + 'smna-finpe/', sourceKey: 'xc50', logsKey: 'smna-finpe', inventoryKey: 'smna-finpe'}
   }
 };

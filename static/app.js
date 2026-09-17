@@ -1,7 +1,7 @@
 'use strict';
 const BASE = 'https://dataserver.cptec.inpe.br/dataserver_dimnt/das/carlos.bastarz/sandbox/SMNAMonitoringApp/cron_scripts/';
 const $ = id => document.getElementById(id);
-const sourceKey=()=>window.SMNA_CONFIG.environments[$('environment').value].sourceKey;
+const inventoryKey=()=>window.SMNA_CONFIG.environments[$('environment').value].inventoryKey;
 const logsKey=()=>window.SMNA_CONFIG.environments[$('environment').value].logsKey;
 const products = [{environment:window.SMNA_CONFIG.environments['smna-fn'].sourceKey,name:'SMNA',label:'SMNA-FNCEP'}];
 const selectors = ['date', 'variable', 'level', 'forecast'];
@@ -199,7 +199,8 @@ async function loadObservations(){
  const ticket=++revision;obsData=[];obsFiltered=[];$('obs-table').replaceChildren();$('obs-total').textContent='';$('obs-meta').textContent='';$('obs-page').textContent='';$('obs-prev').disabled=true;$('obs-next').disabled=true;$('obs-download').disabled=true;
  $('obs-controls').querySelectorAll('input,select').forEach(x=>x.disabled=true);notice('Carregando inventário de observações…');
  try{
-  const {text}=await resource(`obsm/${sourceKey()}/mon_rec_obs_final.csv`);
+  const source=`obsm/${inventoryKey()}/mon_rec_obs_final.csv`;$('obs-source').href=BASE+source;
+  const {text}=await resource(source);
   if(ticket!==revision)return;
   const {data,skipped}=normalizeObservations(text);obsData=data;
   if(!data.length){notice('Nenhum registro válido disponível no inventário.');return;}
@@ -209,7 +210,7 @@ async function loadObservations(){
   checkboxes('obs-types',[...new Set(data.map(r=>r.type))].sort());checkboxes('obs-files',[...new Set(data.map(r=>r.fileType))].sort());
   $('obs-controls').querySelectorAll('input,select').forEach(x=>x.disabled=false);
   $('obs').dataset.skipped=String(skipped);filterObservations();
- }catch(e){if(ticket===revision)notice('Não foi possível carregar o inventário. Atualize para tentar novamente.',true);}
+ }catch(e){if(ticket===revision)notice('Não foi possível carregar o inventário deste ambiente. '+e.message+' Use “Abrir CSV de origem” para conferir o arquivo.',true);}
 }
 function filterObservations(){
  const start=$('obs-start').value,end=$('obs-end').value;

@@ -48,9 +48,9 @@ A configuração HTTP(S) consulta os produtos operacionais no CPTEC, independent
 
 A interface usa SMNA-FNCEP e SMNA-FINPE. Os IDs internos do seletor e dos carregadores locais continuam `smna-fn` e `smna-fc`. As pastas dos produtos agora são `smna-fncep/` e `smna-finpe/`; os nomes das pastas não precisam coincidir com esses IDs. Atualize os caminhos de saída do cron conforme a organização dos produtos. Os nomes anteriores são aceitos como aliases de entrada pelos parsers e para leitura dos índices, mas novas exportações e figuras usam os nomes atuais. Imagens históricas não são regeneradas automaticamente: texto gravado nelas pode manter a nomenclatura anterior.
 
-O rodapé mostra a versão `2026.09.17.2`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
+O rodapé mostra a versão `2026.09.17.3`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
 
-## Novas pastas operacionais — versão 2026.09.17.2
+## Novas pastas operacionais — versão 2026.09.17.3
 
 A origem HTTP(S) permanece no CPTEC em SMNAMonitoringApp/online/static/data/, mas os diagnósticos passam a usar exclusivamente smna-fncep/ e smna-finpe/. As pastas antigas smna-fn/ e smna-fc/ não são apagadas nem usadas como fallback. Cada índice determina a cobertura apresentada; não há fusão automática do histórico antigo com os novos resultados.
 

@@ -53,7 +53,7 @@ A documentação da interpretação científica também está na aba **Sobre**. 
 
 A interface usa SMNA-FNCEP e SMNA-FINPE. Os IDs internos do seletor e dos carregadores locais continuam `smna-fn` e `smna-fc`. As pastas dos produtos agora são `smna-fncep/` e `smna-finpe/`; os nomes das pastas não precisam coincidir com esses IDs. Atualize os caminhos de saída do cron conforme a organização dos produtos. Os nomes anteriores são aceitos como aliases de entrada pelos parsers e para leitura dos índices, mas novas exportações e figuras usam os nomes atuais. Imagens históricas não são regeneradas automaticamente: texto gravado nelas pode manter a nomenclatura anterior.
 
-O rodapé mostra a versão `2026.09.17.2`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
+O rodapé mostra a versão `2026.09.17.3`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
 
 ## Origem operacional dos diagnósticos
 
@@ -69,6 +69,12 @@ Após atualizar o código no host, recarregue a página ignorando o cache. O ind
 
 ## Origem do Status Operacional e Logs Completos
 
-A configuração separa `logsKey` de `sourceKey`: Status e Logs usam `cron_scripts/logs/smna-fncep/` e `cron_scripts/logs/smna-finpe/`; as imagens meteorológicas e o inventário continuam usando os aliases de suas fontes existentes. Não altere sourceKey para corrigir somente a tabela de status. O botão Abrir CSV aponta para a origem selecionada mesmo quando há erro, e o aviso exibe o código HTTP. Não há fallback para CSVs antigos de outro diretório.
+A configuração separa `logsKey` de `sourceKey`: Status e Logs usam `cron_scripts/logs/smna-fncep/` e `cron_scripts/logs/smna-finpe/`; as imagens meteorológicas mantêm sua fonte existente, e o inventário usa a chave independente inventoryKey. Não altere sourceKey para corrigir somente a tabela de status. O botão Abrir CSV aponta para a origem selecionada mesmo quando há erro, e o aviso exibe o código HTTP. Não há fallback para CSVs antigos de outro diretório.
 
 Na verificação desta correção, os dois novos CSVs retornavam HTTP 403. Além de atualizar o código, o operador deve permitir acesso aos diretórios de logs e leitura dos arquivos públicos no servidor (diretórios 755, arquivos 644). A correção da interface não modifica essas permissões.
+
+## Inventário de observações
+
+`inventoryKey` seleciona `cron_scripts/obsm/smna-fncep/mon_rec_obs_final.csv` ou `cron_scripts/obsm/smna-finpe/mon_rec_obs_final.csv`. O botão “Abrir CSV de origem” permite conferir o arquivo realmente consultado; o download filtrado continua disponível separadamente. A normalização dos registros, as unidades e os filtros não mudaram. Não há fallback para os inventários antigos.
+
+Na verificação desta correção, ambos os CSVs novos retornavam HTTP 403. Verifique no host a permissão de travessia dos diretórios (755) e de leitura dos CSVs públicos (644). Atualizar o código não altera as permissões do servidor.
