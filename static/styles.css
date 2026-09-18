@@ -42,3 +42,10 @@
 [data-theme=dark] dialog::backdrop{background:#000b}
 /* Scientific plots and institutional artwork are never inverted or recolored. */
 @media(max-width:850px){.top{flex-wrap:wrap}.header-tools{gap:12px}.theme-toggle{font-size:.8125rem}}
+
+/* Repository link next to the reading-mode switch. */
+.header-tools .github-link{display:inline-flex;align-items:center;gap:7px;min-height:44px;color:#fff;text-decoration:none;font-size:.875rem;white-space:nowrap;border-radius:4px}
+.header-tools .github-link:hover{text-decoration:underline;text-underline-offset:4px}
+.github-link svg{flex-shrink:0}
+@media(max-width:1000px){.top{flex-wrap:wrap}}
+@media(max-width:650px){.header-tools{gap:12px;flex-wrap:wrap}.header-tools .github-link{font-size:.8125rem}}
