@@ -43,7 +43,7 @@ def main():
         files['version.js'] = version_script.encode()
         # Give each committed delivery its own script/cache identity.
         files['index.html'] = re.sub(
-            rb'((?:src|href)="(?:styles\.css|config\.js|app\.js|gsi\.js|version\.js)\?v=)[^"]+',
+            rb'((?:src|href)="(?:styles\.css|config\.js|app\.js|gsi\.js|version\.js|theme\.js)\?v=)[^"]+',
             lambda match: match[1]+commit.encode(), files['index.html'])
     manifest = {'commit': commit, 'files': {name: hashlib.sha256(data).hexdigest()
                                            for name, data in sorted(files.items())}}

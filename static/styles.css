@@ -10,3 +10,35 @@
 
 .map-grid{grid-template-columns:minmax(0,1fr)}
 .parser-doc{text-align:left}.parser-doc td,.parser-doc th{white-space:normal;vertical-align:top}.parser-doc td:first-child{min-width:150px}.about-copy code{overflow-wrap:anywhere}.about-copy details{font-size:1rem}.about-copy summary{font-weight:600}
+
+/* Theme switch remains visible on small screens and supports keyboard activation. */
+.header-tools{display:flex;align-items:center;gap:18px;flex-shrink:0}
+.theme-toggle{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:8px 12px;border:1px solid #ffffff80;border-radius:6px;background:#ffffff12;color:#fff;font-size:.875rem;white-space:nowrap}
+.theme-toggle:hover{background:#ffffff25}
+.theme-track{width:32px;height:18px;background:#ffffff50;border-radius:12px;position:relative;display:inline-block}
+.theme-track::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;background:#fff;border-radius:50%}
+.theme-toggle[aria-checked=true] .theme-track{background:#79c9ff}
+.theme-toggle[aria-checked=true] .theme-track::after{left:17px;background:#102637}
+:root[data-theme=dark]{color-scheme:dark;color:#e0e8f0;background:#111820;--line:#394959;--blue:#61b8f5}
+[data-theme=dark] .top{background:#174b72}
+[data-theme=dark] aside{background:#17212c}
+[data-theme=dark] .parameters,[data-theme=dark] .map-card,[data-theme=dark] dialog{background:#1c2835;color:#e0e8f0}
+[data-theme=dark] .parameters h2,[data-theme=dark] th{background:#253546;color:#e0e8f0}
+[data-theme=dark] select,[data-theme=dark] .parameters input[type=date],[data-theme=dark] .refresh,[data-theme=dark] .stage-tabs button,[data-theme=dark] .pagination button,[data-theme=dark] #close-viewer{background:#202e3c;color:#e0e8f0;border-color:#64788c}
+[data-theme=dark] select:disabled{background:#1a2531}
+[data-theme=dark] .refresh:hover,[data-theme=dark] tr:hover{background:#293f53}
+[data-theme=dark] a,[data-theme=dark] summary{color:#87caff}
+[data-theme=dark] .identity,[data-theme=dark] footer,[data-theme=dark] .heading p,[data-theme=dark] .footnote,[data-theme=dark] .source,[data-theme=dark] details,[data-theme=dark] .tabs button,[data-theme=dark] .gsi-cards span,[data-theme=dark] .gsi-figure figcaption,[data-theme=dark] .image-message,[data-theme=dark] .map-card .card-bottom,[data-theme=dark] #notice{color:#b4c4d4}
+[data-theme=dark] .tabs button[aria-current],[data-theme=dark] .environment-label{background:#213d55;color:#a6d8ff;border-color:#466887}
+[data-theme=dark] .stage-tabs button[aria-pressed=true]{background:#235b86;color:#fff;border-color:#6cb8ec}
+[data-theme=dark] .map-frame,[data-theme=dark] #log-content{background:#131e29;color:#e0e8f0}
+[data-theme=dark] tr:nth-child(even){background:#1b2936}
+[data-theme=dark] tr:hover{background:#293f53}
+[data-theme=dark] .button,[data-theme=dark] #obs-download{background:#1a302a;color:#99e0b3;border-color:#62a87d}
+[data-theme=dark] .awaiting{background:#493918;color:#ffe0a1}
+[data-theme=dark] .completed{background:#204231;color:#acf0c2}
+[data-theme=dark] .processing{background:#243e5c;color:#b4d9ff}
+[data-theme=dark] #notice.error,[data-theme=dark] #gsi-state.error,[data-theme=dark] .gsi-alert{background:#3c2c20;color:#ffd4a3;border-left-color:#efa353}
+[data-theme=dark] dialog::backdrop{background:#000b}
+/* Scientific plots and institutional artwork are never inverted or recolored. */
+@media(max-width:850px){.top{flex-wrap:wrap}.header-tools{gap:12px}.theme-toggle{font-size:.8125rem}}

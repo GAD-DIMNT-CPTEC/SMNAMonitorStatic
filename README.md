@@ -53,7 +53,7 @@ A documentação da interpretação científica também está na aba **Sobre**. 
 
 A interface usa SMNA-FNCEP e SMNA-FINPE. Os IDs internos do seletor e dos carregadores locais continuam `smna-fn` e `smna-fc`. As pastas dos produtos agora são `smna-fncep/` e `smna-finpe/`; os nomes das pastas não precisam coincidir com esses IDs. Atualize os caminhos de saída do cron conforme a organização dos produtos. Os nomes anteriores são aceitos como aliases de entrada pelos parsers e para leitura dos índices, mas novas exportações e figuras usam os nomes atuais. Imagens históricas não são regeneradas automaticamente: texto gravado nelas pode manter a nomenclatura anterior.
 
-O rodapé mostra a versão `2026.09.18.2`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
+O rodapé mostra a versão `2026.09.18.3`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
 
 ## Origem operacional dos diagnósticos
 
@@ -94,3 +94,7 @@ A publicação não modifica o dataserver, os parsers, o cron ou as figuras. A m
 A fonte dos campos FNCEP é `cron_scripts/anls_imgs/egeon/SMNA-FNCEP/`. A pasta do produto foi corrigida de `SMNA` para `SMNA-FNCEP`, mantendo `egeon` como diretório da origem. A mesma construção de caminho atende às listagens de datas, variáveis, níveis e prazos, à imagem, ao pop-up e ao link original. Não há fallback para a pasta antiga. Os caminhos dos diagnósticos GSI permanecem inalterados.
 
 As falhas de carregamento em Status, Diagnósticos GSI, Inventário e Logs usam mensagens em português, sem detalhes técnicos do fetch. O alerta GSI compartilha o estilo do Status Operacional.
+
+## Modo noturno
+
+O seletor no cabeçalho alterna os temas claro e escuro em todas as abas. Na primeira visita, segue a preferência do sistema; depois, lembra a escolha neste navegador. Sem acesso ao armazenamento local, a alternância continua funcionando durante a visita. As figuras científicas mantêm suas cores originais. A preferência é independente entre GitHub Pages, dataserver e abertura local.
