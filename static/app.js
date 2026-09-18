@@ -3,8 +3,7 @@ const BASE = 'https://dataserver.cptec.inpe.br/dataserver_dimnt/das/carlos.basta
 const $ = id => document.getElementById(id);
 const inventoryKey=()=>window.SMNA_CONFIG.environments[$('environment').value].inventoryKey;
 const logsKey=()=>window.SMNA_CONFIG.environments[$('environment').value].logsKey;
-// O diretório operacional publicado permanece SMNA; o rótulo público é SMNA-FNCEP.
-const products = [{environment:window.SMNA_CONFIG.environments['smna-fn'].sourceKey,name:'SMNA',label:'SMNA-FNCEP'}];
+const products = [{environment:window.SMNA_CONFIG.environments['smna-fn'].sourceKey,name:'SMNA-FNCEP',label:'SMNA-FNCEP'}];
 const selectors = ['date', 'variable', 'level', 'forecast'];
 const cache = new Map();
 let revision = 0, view = 'status';
