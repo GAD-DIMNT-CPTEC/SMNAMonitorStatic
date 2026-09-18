@@ -127,7 +127,7 @@ async function loadStatus(){
   const parsed=latest?Date.parse(latest.replace(/^(\d{4}-\d{2}-\d{2})-(\d{2}:\d{2})$/,'$1T$2:00Z')):NaN;
   const old=Number.isFinite(parsed)&&Date.now()-parsed>36*3600000;
   notice(rows.length?`${old?'Dados antigos: ':''}último registro publicado em ${latest}. Horários em UTC.`:'Nenhum registro publicado.',old);
- }catch(e){if(ticket!==revision)return;notice('Não foi possível carregar o CSV de status deste ambiente. '+e.message+' Use “Abrir CSV” para conferir a origem.',true);}
+ }catch(e){if(ticket!==revision)return;notice('Não foi possível carregar o arquivo CSV de status deste ambiente.',true);}
 }
 let logStage='gsi', logFiles={}, logBlob=null, obsData=[], obsFiltered=[], obsPage=0;
 const PAGE_SIZE=100;
@@ -145,7 +145,7 @@ async function loadLogs(){
  }));
  if(ticket!==revision)return;
  for(const r of results)if(r.status==='fulfilled')logFiles[r.value[0]]=r.value[1];
- if(results.some(r=>r.status==='rejected')){notice('Falha ao consultar os diretórios de logs. Atualize para tentar novamente.',true);return;}
+ if(results.some(r=>r.status==='rejected')){notice('Não foi possível consultar os diretórios dos logs.',true);return;}
  const cycles=[...new Set(Object.values(logFiles).flat().map(f=>f.match(/_(\d{10})/)[1]))].sort().reverse();
  setOptions('log-date',cycles,dateLabel,cycles[0]);
  if(!cycles.length){notice('Nenhum log publicado para este ambiente.');return;}
@@ -210,7 +210,7 @@ async function loadObservations(){
   checkboxes('obs-types',[...new Set(data.map(r=>r.type))].sort());checkboxes('obs-files',[...new Set(data.map(r=>r.fileType))].sort());
   $('obs-controls').querySelectorAll('input,select').forEach(x=>x.disabled=false);
   $('obs').dataset.skipped=String(skipped);filterObservations();
- }catch(e){if(ticket===revision)notice('Não foi possível carregar o inventário deste ambiente. '+e.message+' Use “Abrir CSV de origem” para conferir o arquivo.',true);}
+ }catch(e){if(ticket===revision)notice('Não foi possível carregar o inventário deste ambiente.',true);}
 }
 function filterObservations(){
  const start=$('obs-start').value,end=$('obs-end').value;

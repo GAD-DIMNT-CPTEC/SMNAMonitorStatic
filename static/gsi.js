@@ -2,6 +2,7 @@
 (()=>{
  const el=id=>document.getElementById(id);let index=null,detail=null,request=0,gallery=[];
  let dataRoot='',activeEnvironment='',loadTicket=0;
+ function loadError(){el('gsi-state').className='error';el('gsi-state').textContent='Não foi possível carregar as imagens para este ambiente.';}
  const environment=()=>el('environment').value;
  const dataPath=path=>dataRoot+path.replace(/^gsi\//,'');
  const fmt=(v,d=2)=>v==null?'—':Number(v).toLocaleString('pt-BR',{maximumFractionDigits:d});
@@ -44,7 +45,7 @@
 
  const units={ps:'mb',t:'K',uv:'m/s',q:'% q-sat guess',sst:'°C',gps:'nativa'};
  function fits(){const rows=detail?.tables.fits||[],out=[];for(const obs of [...new Set(rows.filter(r=>r.use===el('gsi-use').value).map(r=>r.obs))].sort()){const rr=rows.filter(r=>r.obs===obs&&r.use===el('gsi-use').value).sort((a,b)=>a.evaluation-b.evaluation),a=rr[0],z=rr.at(-1);out.push([obs,units[obs]||a.units,`${a.evaluation} → ${z.evaluation}`,fmt(a.count,0),fmt(z.count,0),a.count>0?fmt(a.rms,4):'—',z.count>0?fmt(z.rms,4):'—',a.count>0?fmt(a.bias,4):'—',z.count>0?fmt(z.bias,4):'—']);}table('gsi-fit',['Variável','Unidade','Avaliações','N inicial','N final','RMS inicial','RMS final','Bias inicial','Bias final'],out);}
- async function cycle(){if(!index||!el('gsi-cycle').value)return;const n=++request,c=el('gsi-cycle').value,s=index.cycles.find(r=>r.cycle===c);detail=null;gallery=[];el('gsi-gallery').replaceChildren();el('gsi-state').textContent='Carregando ciclo…';el('gsi-cards').replaceChildren();el('gsi-image').hidden=true;el('gsi-image-link').disabled=true;el('gsi-json').hidden=true;el('gsi-quality').textContent='';el('gsi-warnings').replaceChildren();fits();table('gsi-humidity',[],[]);table('gsi-mass',[],[]);table('gsi-rad',[],[]);table('gsi-channels',[],[]);
+ async function cycle(){if(!index||!el('gsi-cycle').value)return;const n=++request,c=el('gsi-cycle').value,s=index.cycles.find(r=>r.cycle===c);detail=null;gallery=[];el('gsi-gallery').replaceChildren();el('gsi-state').className='';el('gsi-state').textContent='Carregando ciclo…';el('gsi-cards').replaceChildren();el('gsi-image').hidden=true;el('gsi-image-link').disabled=true;el('gsi-json').hidden=true;el('gsi-quality').textContent='';el('gsi-warnings').replaceChildren();fits();table('gsi-humidity',[],[]);table('gsi-mass',[],[]);table('gsi-rad',[],[]);table('gsi-channels',[],[]);
  try{if(s.state!=='parsed')throw Error(s.error?.includes('No GSI files')?'Ainda não havia arquivos GSI neste ciclo no momento da extração.':(s.error||'Ciclo não interpretado'));const results=localMode?await localCycle(c).then(x=>[{status:'fulfilled',value:x.detail},{status:'fulfilled',value:x.figures}]):await Promise.allSettled([read(`gsi/cycles/${c}.json.gz`),read(`gsi/plots/${c}/figures.json`)]);if(n!==request)return;
  const [dataResult,figuresResult]=results;gallery=figuresResult.status==='fulfilled'?figuresResult.value.map(f=>({...f,title:f.title.replace(/\bSMNA-FN\b/g,'SMNA-FNCEP').replace(/\bSMNA-FC\b/g,'SMNA-FINPE'),file:f.file||f.png})):[];chartOptions();chart();
  if(dataResult.status!=='fulfilled')throw Error('As figuras disponíveis estão abaixo; não foi possível carregar as tabelas: '+dataResult.reason.message);
@@ -58,8 +59,8 @@
  table('gsi-humidity',['Aval.','Condição','Variável','Contagem','RMS nativo'],d.tables.humidity.map(r=>[r.evaluation,r.condition,r.variable,fmt(r.count,0),fmt(r.rms,6)]));
  table('gsi-mass',['Aval.','mean_ps','mean_pw','pdryini'],d.tables.mass.map(r=>[r.evaluation,fmt(r.mean_ps,6),fmt(r.mean_pw,6),fmt(r.pdryini,6)]));
  el('gsi-quality').textContent=`${s.unparsed} linhas não interpretadas. Arquivos de referência ausentes: ${s.missing.join(', ')||'nenhum'}. Memória máxima reportada: ${fmt(s.max_rss_kb,0)} KB.${s.selected_stdout?' Stdout associado: '+s.selected_stdout+'. Logs anteriores excluídos: '+s.excluded_stdout_files.join(', ')+'. Associação por sequência de minimização idêntica e horário de modificação.':''}`;
- for(const w of d.warnings){const li=document.createElement('li');li.textContent=`${w.source||'Execução'}${w.line?' · linha '+w.line:''}: ${warning(w.message)}`;el('gsi-warnings').append(li);}chart();
- }catch(e){if(n!==request)return;el('gsi-state').textContent=e.message;if(el('gsi-chart').value==='history')chart();}}
+ for(const w of d.warnings){const li=document.createElement('li');li.textContent=`${w.source||'Execução'}${w.line?' · linha '+w.line:''}: ${warning(w.message)}`;el('gsi-warnings').append(li);}chart();if(figuresResult.status==='rejected')loadError();
+ }catch(e){if(n!==request)return;loadError();if(el('gsi-chart').value==='history')chart();}}
  function reset(){
  detail=null;gallery=[];index=null;el('gsi-cycle').disabled=true;el('gsi-chart').disabled=true;
  el('gsi-cycle').replaceChildren();el('gsi-gallery').replaceChildren();el('gsi-cards').replaceChildren();
@@ -73,7 +74,7 @@
  const ticket=++loadTicket,env=environment(),config=window.SMNA_CONFIG.environments[env];++request;
  if(env!==activeEnvironment||force){reset();activeEnvironment=env;dataRoot=config.gsiRoot.replace(/\/?$/,'/');}
  try{
- if(!index){const loaded=await readIndex(env,dataRoot);if(ticket!==loadTicket)return;
+ if(!index){el('gsi-state').className='';el('gsi-state').textContent='Carregando ambiente…';const loaded=await readIndex(env,dataRoot);if(ticket!==loadTicket)return;
  if(![config.label,...(config.aliases||[])].includes(loaded.environment))throw Error('O índice não corresponde ao ambiente '+config.label+'. Confira config.js e a geração dos dados.');
  index=loaded;el('gsi-cycle').replaceChildren(...[...index.cycles].reverse().map(s=>new Option(date(s.cycle)+(s.state!=='parsed'?' · indisponível':s.last_cost===0?' · custo zero':''),s.cycle)));
  el('gsi-cycle').value=[...index.cycles].reverse().find(s=>s.state==='parsed')?.cycle||index.cycles.at(-1)?.cycle||'';
@@ -84,7 +85,7 @@
  for(const id of ['gsi-summary-csv','gsi-fits-csv'])el(id).hidden=false;
  if(!index.cycles.length){el('gsi-state').textContent='Nenhum ciclo disponível neste ambiente.';return;}
  el('gsi-cycle').disabled=false;el('gsi-chart').disabled=false;await cycle();
- }catch(e){if(ticket===loadTicket)el('gsi-state').textContent=e.message;}
+ }catch(e){if(ticket===loadTicket)loadError();}
  };
  el('gsi-image-link').addEventListener('click',()=>{const img=el('gsi-image');if(!img.hidden&&img.complete&&img.naturalWidth)showImageViewer(img.currentSrc||img.src,img.alt);});
  el('gsi-image').addEventListener('load',()=>{el('gsi-image-link').disabled=el('gsi-image').hidden;});
