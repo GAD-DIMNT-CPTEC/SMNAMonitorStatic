@@ -51,7 +51,7 @@ async function loadMaps(start=0){
   if(ticket!==revision)return;
   drawMaps(available,ticket);
   notice(`${dateLabel($('date').value)} · ${variableNames[$('variable').value]||$('variable').value} · Nível ${$('level').value} · +${$('forecast').value} h`);
- }catch(e){if(ticket!==revision)return;clearMaps('Não foi possível consultar as imagens.');notice('Falha ao acessar o servidor de dados. Use “Atualizar disponibilidade” para tentar novamente.',true);}
+ }catch(e){if(ticket!==revision)return;clearMaps('Não foi possível consultar as imagens.');notice('Falha ao acessar o servidor de dados.',true);}
 }
 function showImageViewer(url,description){
  $('viewer-title').textContent=description;$('large-image').src=url;$('large-image').alt=description;$('original-link').href=url;$('viewer').showModal();
