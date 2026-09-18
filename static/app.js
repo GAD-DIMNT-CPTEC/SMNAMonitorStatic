@@ -51,7 +51,7 @@ async function loadMaps(start=0){
   if(ticket!==revision)return;
   drawMaps(available,ticket);
   notice(`${dateLabel($('date').value)} · ${variableNames[$('variable').value]||$('variable').value} · Nível ${$('level').value} · +${$('forecast').value} h`);
- }catch(e){if(ticket!==revision)return;clearMaps('Não foi possível consultar as imagens.');notice('Falha ao acessar o servidor de dados.',true);}
+ }catch(e){if(ticket!==revision)return;clearMaps('Não foi possível consultar as imagens.');notice('Não foi possível carregar a imagem deste ambiente.',true);}
 }
 function showImageViewer(url,description){
  $('viewer-title').textContent=description;$('large-image').src=url;$('large-image').alt=description;$('original-link').href=url;$('viewer').showModal();
@@ -145,7 +145,7 @@ async function loadLogs(){
  }));
  if(ticket!==revision)return;
  for(const r of results)if(r.status==='fulfilled')logFiles[r.value[0]]=r.value[1];
- if(results.some(r=>r.status==='rejected')){notice('Não foi possível consultar os diretórios dos logs.',true);return;}
+ if(results.some(r=>r.status==='rejected')){notice('Não foi possível carregar os logs deste ambiente.',true);return;}
  const cycles=[...new Set(Object.values(logFiles).flat().map(f=>f.match(/_(\d{10})/)[1]))].sort().reverse();
  setOptions('log-date',cycles,dateLabel,cycles[0]);
  if(!cycles.length){notice('Nenhum log publicado para este ambiente.');return;}

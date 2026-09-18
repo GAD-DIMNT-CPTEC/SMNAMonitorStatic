@@ -2,7 +2,7 @@
 (()=>{
  const el=id=>document.getElementById(id);let index=null,detail=null,request=0,gallery=[];
  let dataRoot='',activeEnvironment='',loadTicket=0;
- function loadError(){el('gsi-state').className='error';el('gsi-state').textContent='Não foi possível carregar as imagens para este ambiente.';}
+ function loadError(){el('gsi-state').className='error';el('gsi-state').textContent='Não foi possível carregar as imagens deste ambiente.';}
  const environment=()=>el('environment').value;
  const dataPath=path=>dataRoot+path.replace(/^gsi\//,'');
  const fmt=(v,d=2)=>v==null?'—':Number(v).toLocaleString('pt-BR',{maximumFractionDigits:d});
