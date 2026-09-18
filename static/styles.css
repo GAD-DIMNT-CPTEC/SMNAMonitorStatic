@@ -7,6 +7,10 @@
 .brand{min-width:0;overflow-wrap:break-word;line-height:1.3}.institution{flex-shrink:0}
 
 #gsi-gallery h3{font-size:1.05rem;margin:8px 8px 16px}#gsi-gallery .image-button{height:auto}#gsi-gallery .gsi-figure{margin:20px 0 30px}
+/* Ajusta o painel à altura natural do mapa, sem espaço vertical excedente. */
+#maps .map-frame{aspect-ratio:auto;min-height:0}
+#maps .image-button{height:auto}
+#maps .image-message{min-height:180px;display:flex;align-items:center;justify-content:center}
 
 .map-grid{grid-template-columns:minmax(0,1fr)}
 .parser-doc{text-align:left}.parser-doc td,.parser-doc th{white-space:normal;vertical-align:top}.parser-doc td:first-child{min-width:150px}.about-copy code{overflow-wrap:anywhere;background:#eef3f7;border:1px solid #d8e1e8;border-radius:4px;padding:.08rem .28rem;font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;font-size:.9em;color:#243b53}.about-copy details{font-size:1rem}.about-copy summary{font-weight:600}
