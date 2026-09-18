@@ -48,7 +48,7 @@ A configuração HTTP(S) consulta os produtos operacionais no CPTEC, independent
 
 A interface usa SMNA-FNCEP e SMNA-FINPE. Os IDs internos do seletor e dos carregadores locais continuam `smna-fn` e `smna-fc`. As pastas dos produtos agora são `smna-fncep/` e `smna-finpe/`; os nomes das pastas não precisam coincidir com esses IDs. Atualize os caminhos de saída do cron conforme a organização dos produtos. Os nomes anteriores são aceitos como aliases de entrada pelos parsers e para leitura dos índices, mas novas exportações e figuras usam os nomes atuais. Imagens históricas não são regeneradas automaticamente: texto gravado nelas pode manter a nomenclatura anterior.
 
-O rodapé mostra a versão `2026.09.17.3`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
+O rodapé mostra a versão `2026.09.18.1`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
 
 ## Novas pastas operacionais — versão 2026.09.17.3
 
@@ -65,3 +65,7 @@ Pushes em main que alteram a interface, o exportador ou o workflow disparam o de
 O endereço alternativo é https://gad-dimnt-cptec.github.io/SMNAMonitorStatic/. Para manter o dataserver na mesma revisão, exporte o commit indicado no Pages com `--ref COMMIT` e instale a entrega manualmente pelo procedimento acima. O workflow nunca acessa nem modifica a instalação no dataserver.
 
 Os dados continuam externos, na origem operacional atual. O Pages não oferece cópia de contingência das figuras ou tabelas; a disponibilidade dos produtos e a liberação de CORS no dataserver continuam necessárias. Não foram incluídos resultados históricos locais como substitutos dos dados atuais.
+
+## Campos meteorológicos — versão 2026.09.18.1
+
+A fonte dos campos FNCEP é `cron_scripts/anls_imgs/egeon/SMNA-FNCEP/`. A pasta do produto foi corrigida de `SMNA` para `SMNA-FNCEP`, mantendo `egeon` como diretório da origem. A mesma construção de caminho atende às listagens de datas, variáveis, níveis e prazos, à imagem, ao pop-up e ao link original. Não há fallback para a pasta antiga. Os caminhos dos diagnósticos GSI permanecem inalterados.

@@ -53,7 +53,7 @@ A documentação da interpretação científica também está na aba **Sobre**. 
 
 A interface usa SMNA-FNCEP e SMNA-FINPE. Os IDs internos do seletor e dos carregadores locais continuam `smna-fn` e `smna-fc`. As pastas dos produtos agora são `smna-fncep/` e `smna-finpe/`; os nomes das pastas não precisam coincidir com esses IDs. Atualize os caminhos de saída do cron conforme a organização dos produtos. Os nomes anteriores são aceitos como aliases de entrada pelos parsers e para leitura dos índices, mas novas exportações e figuras usam os nomes atuais. Imagens históricas não são regeneradas automaticamente: texto gravado nelas pode manter a nomenclatura anterior.
 
-O rodapé mostra a versão `2026.09.17.3`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
+O rodapé mostra a versão `2026.09.18.1`. Em uma cópia direta do código, essa é a identificação da release; não é uma declaração de que a cópia está sem modificações. Ao executar `scripts/export_site.py`, a entrega passa a mostrar também a hash exata do commit exportado, com link para o GitHub, tanto por HTTP quanto por file://. O arquivo version.json continua oferecendo os hashes para detectar alterações posteriores.
 
 ## Origem operacional dos diagnósticos
 
@@ -88,3 +88,7 @@ O workflow `.github/workflows/pages.yml` exporta o frontend do commit e publica 
 Esta hospedagem mantém a interface disponível em outro provedor, mas **não espelha os dados operacionais**. Imagens, JSONs e CSVs continuam nos endereços atuais do dataserver. Durante uma indisponibilidade desse servidor, as consultas não carregarão. Quando ele retornar, recarregue a página. O servidor precisa permitir CORS para leitura dos dados pelo domínio do Pages.
 
 A publicação não modifica o dataserver, os parsers, o cron ou as figuras. A mesma exportação funciona na pasta atual do dataserver e no subdiretório do GitHub Pages, pois os recursos da interface usam caminhos relativos e as fontes operacionais usam URLs absolutas. Para ter também os resultados disponíveis durante uma queda, será necessário manter um espelho atualizado dos produtos em uma origem independente.
+
+## Campos meteorológicos — versão 2026.09.18.1
+
+A fonte dos campos FNCEP é `cron_scripts/anls_imgs/egeon/SMNA-FNCEP/`. A pasta do produto foi corrigida de `SMNA` para `SMNA-FNCEP`, mantendo `egeon` como diretório da origem. A mesma construção de caminho atende às listagens de datas, variáveis, níveis e prazos, à imagem, ao pop-up e ao link original. Não há fallback para a pasta antiga. Os caminhos dos diagnósticos GSI permanecem inalterados.
