@@ -235,8 +235,17 @@ function drawObservations(){
  const pages=Math.ceil(obsFiltered.length/PAGE_SIZE);$('obs-page').textContent=pages?`Página ${obsPage+1} de ${pages} · até ${PAGE_SIZE} registros`:'Nenhum registro';$('obs-prev').disabled=obsPage===0;$('obs-next').disabled=obsPage+1>=pages;$('obs-download').disabled=!obsFiltered.length;
 }
 function observationCSV(){return [observationHeaders(),...obsFiltered.map(observationCells)].map(row=>row.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\r\n');}
+function updateNextUpdate(){
+ const key=view==='maps'?'smna-fn':$('environment').value,updates=window.SMNA_CONFIG.environments[key].updates;
+ const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts();
+ const values=Object.fromEntries(parts.filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));
+ const now=Number(values.hour)*60+Number(values.minute);
+ const next=updates.find(update=>{const [hour,minute]=update.time.split(':').map(Number);return hour*60+minute>now;})||updates[0];
+ $('next-update').textContent=`Próxima atualização às ${next.time.replace(':','h')}`;
+}
 function update(){
  $('env-label').textContent=view==='maps'?'SMNA-FNCEP':$('environment').selectedOptions[0].text;
+ updateNextUpdate();
  if(view==='gsi'){++revision;notice('');window.loadGSIDiagnostics();}else if(view==='maps')loadMaps();else if(view==='status')loadStatus();else if(view==='logs')loadLogs();else if(view==='obs')loadObservations();else {++revision;notice('');}
 }
 function switchView(next){
@@ -248,7 +257,7 @@ function switchView(next){
  $('map-controls').hidden=next!=='maps';$('log-controls').hidden=next!=='logs';$('obs-controls').hidden=next!=='obs';$('gsi-controls').hidden=next!=='gsi';
  document.querySelector('.parameters').hidden=next==='about';$('environment').hidden=next==='maps';document.querySelector('label[for="environment"]').hidden=next==='maps';$('refresh').hidden=false;$('env-label').hidden=next==='about';
  const titles={gsi:['Diagnósticos GSI','Minimização, observações e desempenho por ciclo de análise.'],maps:['Campos Meteorológicos','Campos meteorológicos do SMNA no SMNA-FNCEP.'],status:['Status Operacional','Acompanhamento das etapas GSI, PRE, MODEL e POS.'],logs:['Logs Completos','Logs completos das etapas de execução.'],obs:['Inventário Observações','Inventário dos arquivos de observações.'],about:['Sobre','Sistema de Monitoramento da Assimilação de Dados · CPTEC/INPE']};
- document.querySelector('.source').hidden=next==='gsi';$('title').textContent=titles[next][0];$('subtitle').textContent=titles[next][1];update();
+ document.querySelector('.source').hidden=next==='gsi';$('title').textContent=titles[next][0];$('subtitle').textContent=titles[next][1];$('next-update').hidden=next==='about';update();
 }
 $('tab-maps').addEventListener('click',()=>switchView('maps'));
 $('tab-status').addEventListener('click',()=>switchView('status'));
@@ -263,4 +272,4 @@ $('environment').addEventListener('change',update);
 selectors.forEach((id,i)=>$(id).addEventListener('change',()=>loadMaps(i===3?3:i+1)));
 $('refresh').addEventListener('click',()=>{cache.clear();if(view==='gsi')window.loadGSIDiagnostics(true);else update();});
 $('close-viewer').addEventListener('click',()=>$('viewer').close());
-window.addEventListener('DOMContentLoaded',()=>{$('environment').value=window.SMNA_CONFIG.defaultEnvironment;if(location.hash==='#gsi')switchView('gsi');else switchView('status');});
+window.addEventListener('DOMContentLoaded',()=>{$('environment').value=window.SMNA_CONFIG.defaultEnvironment;if(location.hash==='#gsi')switchView('gsi');else switchView('status');setInterval(updateNextUpdate,30000);});
