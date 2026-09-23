@@ -30,7 +30,7 @@ def main():
         meta, name = record.split(b'\t', 1)
         mode, kind, oid = meta.decode().split()
         relative = Path(name.decode()).relative_to('static')
-        if relative.parts[0] == 'data' or str(relative) == 'version.json':
+        if relative.parts[0] in ('data', 'bam') or str(relative) == 'version.json':
             continue
         if kind != 'blob' or mode not in ('100644', '100755'):
             parser.error(f'Unsupported frontend entry: {relative}')
@@ -43,7 +43,7 @@ def main():
         files['version.js'] = version_script.encode()
         # Give each committed delivery its own script/cache identity.
         files['index.html'] = re.sub(
-            rb'((?:src|href)="(?:styles\.css|config\.js|app\.js|gsi\.js|version\.js|theme\.js)\?v=)[^"]+',
+            rb'((?:src|href)="(?:styles\.css|config\.js|app\.js|gsi\.js|bam\.js|version\.js|theme\.js)\?v=)[^"]+',
             lambda match: match[1]+commit.encode(), files['index.html'])
     manifest = {'commit': commit, 'files': {name: hashlib.sha256(data).hexdigest()
                                            for name, data in sorted(files.items())}}

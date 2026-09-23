@@ -246,22 +246,22 @@ function updateNextUpdate(){
 function update(){
  $('env-label').textContent=view==='maps'?'SMNA-FNCEP':$('environment').selectedOptions[0].text;
  updateNextUpdate();
- if(view==='gsi'){++revision;notice('');window.loadGSIDiagnostics();}else if(view==='maps')loadMaps();else if(view==='status')loadStatus();else if(view==='logs')loadLogs();else if(view==='obs')loadObservations();else {++revision;notice('');}
+ if(view==='bam'){++revision;notice('');window.loadBAMDiagnostics();}else if(view==='gsi'){++revision;notice('');window.loadGSIDiagnostics();}else if(view==='maps')loadMaps();else if(view==='status')loadStatus();else if(view==='logs')loadLogs();else if(view==='obs')loadObservations();else {++revision;notice('');}
 }
 function switchView(next){
  view=next;
- for(const name of ['maps','status','logs','obs','gsi','about']){
+ for(const name of ['maps','status','logs','obs','gsi','bam','about']){
   $(name).hidden=next!==name;
   if(next===name)$('tab-'+name).setAttribute('aria-current','page');else $('tab-'+name).removeAttribute('aria-current');
  }
- $('map-controls').hidden=next!=='maps';$('log-controls').hidden=next!=='logs';$('obs-controls').hidden=next!=='obs';$('gsi-controls').hidden=next!=='gsi';
+ $('bam-controls').hidden=next!=='bam';$('map-controls').hidden=next!=='maps';$('log-controls').hidden=next!=='logs';$('obs-controls').hidden=next!=='obs';$('gsi-controls').hidden=next!=='gsi';
  document.querySelector('.parameters').hidden=next==='about';$('environment').hidden=next==='maps';document.querySelector('label[for="environment"]').hidden=next==='maps';$('refresh').hidden=false;$('env-label').hidden=next==='about';
- const titles={gsi:['Diagnósticos GSI','Minimização, observações e desempenho por ciclo de análise.'],maps:['Campos Meteorológicos','Campos meteorológicos do SMNA no SMNA-FNCEP.'],status:['Status Operacional','Acompanhamento das etapas GSI, PRE, MODEL e POS.'],logs:['Logs Completos','Logs completos das etapas de execução.'],obs:['Inventário Observações','Inventário dos arquivos de observações.'],about:['Sobre','Sistema de Monitoramento da Assimilação de Dados · CPTEC/INPE']};
- document.querySelector('.source').hidden=next==='gsi';$('title').textContent=titles[next][0];$('subtitle').textContent=titles[next][1];$('next-update').hidden=next==='about';update();
+ const titles={bam:['Diagnósticos BAM','Integração, perfis atmosféricos e balanços globais do modelo.'],gsi:['Diagnósticos GSI','Minimização, observações e desempenho por ciclo de análise.'],maps:['Campos Meteorológicos','Campos meteorológicos do SMNA no SMNA-FNCEP.'],status:['Status Operacional','Acompanhamento das etapas GSI, PRE, MODEL e POS.'],logs:['Logs Completos','Logs completos das etapas de execução.'],obs:['Inventário Observações','Inventário dos arquivos de observações.'],about:['Sobre','Sistema de Monitoramento da Assimilação de Dados · CPTEC/INPE']};
+ document.querySelector('.source').hidden=(next==='gsi'||next==='bam');$('title').textContent=titles[next][0];$('subtitle').textContent=titles[next][1];$('next-update').hidden=next==='about';update();
 }
 $('tab-maps').addEventListener('click',()=>switchView('maps'));
 $('tab-status').addEventListener('click',()=>switchView('status'));
-for(const name of ['logs','obs','gsi','about'])$('tab-'+name).addEventListener('click',()=>switchView(name));
+for(const name of ['logs','obs','gsi','bam','about'])$('tab-'+name).addEventListener('click',()=>switchView(name));
 $('log-date').addEventListener('change',selectLog);$('log-file').addEventListener('change',loadLogFile);
 document.querySelectorAll('[data-stage]').forEach(button=>button.addEventListener('click',()=>{logStage=button.dataset.stage;document.querySelectorAll('[data-stage]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));selectLog();}));
 for(const id of ['obs-start','obs-end','obs-hour','obs-unit'])$(id).addEventListener('change',filterObservations);
@@ -270,6 +270,6 @@ $('obs-next').addEventListener('click',()=>{if((obsPage+1)*PAGE_SIZE<obsFiltered
 $('obs-download').addEventListener('click',()=>fileDownload(observationCSV(),`obs_storage_${$('environment').value}.csv`));
 $('environment').addEventListener('change',update);
 selectors.forEach((id,i)=>$(id).addEventListener('change',()=>loadMaps(i===3?3:i+1)));
-$('refresh').addEventListener('click',()=>{cache.clear();if(view==='gsi')window.loadGSIDiagnostics(true);else update();});
+$('refresh').addEventListener('click',()=>{cache.clear();if(view==='gsi')window.loadGSIDiagnostics(true);else if(view==='bam')window.loadBAMDiagnostics(true);else update();});
 $('close-viewer').addEventListener('click',()=>$('viewer').close());
-window.addEventListener('DOMContentLoaded',()=>{$('environment').value=window.SMNA_CONFIG.defaultEnvironment;if(location.hash==='#gsi')switchView('gsi');else switchView('status');setInterval(updateNextUpdate,30000);});
+window.addEventListener('DOMContentLoaded',()=>{$('environment').value=window.SMNA_CONFIG.defaultEnvironment;if(location.hash==='#bam'){switchView('bam');}else if(location.hash==='#gsi')switchView('gsi');else switchView('status');setInterval(updateNextUpdate,30000);});
