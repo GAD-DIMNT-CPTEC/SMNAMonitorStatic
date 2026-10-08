@@ -98,3 +98,15 @@ As falhas de carregamento em Status, Diagnósticos GSI, Inventário e Logs usam 
 ## Modo noturno
 
 O seletor no cabeçalho alterna os temas claro e escuro em todas as abas. Na primeira visita, segue a preferência do sistema; depois, lembra a escolha neste navegador. Sem acesso ao armazenamento local, a alternância continua funcionando durante a visita. As figuras científicas mantêm suas cores originais. A preferência é independente entre GitHub Pages, dataserver e abertura local.
+
+### Links para uma seleção específica
+
+A página aceita `environment` e `cycle` (AAAAMMDDHH em UTC) na query string.
+Com `#maps`, aceita também `variable`, `level` e `forecast`; com `#gsi`,
+`chart=convergence` seleciona a minimização. Uma seleção solicitada indisponível
+é sinalizada, sem substituição automática por outro ciclo.
+
+Exemplos:
+
+- `?environment=smna-fn&cycle=2026100700&variable=Surface_temperature&level=1000&forecast=0#maps`
+- `?environment=smna-fn&cycle=2026100700&chart=convergence#gsi`

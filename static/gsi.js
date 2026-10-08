@@ -1,5 +1,8 @@
 /* Local, precomputed diagnostics. Fetch only the index and the selected cycle. */
 (()=>{
+ const entry=new URLSearchParams(location.search);
+ let requestedCycle=location.hash==='#gsi'?entry.get('cycle'):null;
+ let requestedChart=location.hash==='#gsi'?entry.get('chart'):null;
  const el=id=>document.getElementById(id);let index=null,detail=null,request=0,gallery=[];
  let dataRoot='',activeEnvironment='',loadTicket=0;
  function loadError(){el('gsi-state').className='error';el('gsi-state').textContent='Não foi possível carregar as imagens deste ambiente.';}
@@ -38,9 +41,10 @@
  }
  const chartNames={convergence:'Minimização',fit:'Ajuste RMS',qc:'Uso e rejeição',profiles:'Perfis verticais',counts:'Contagens finais',radiances:'Radiâncias por satélite',channels:'Canais de radiância',constraints:'Massa e umidade',jterms:'Contribuições de J'};
  function chartOptions(){
- const select=el('gsi-chart'),previous=select.value,kind=previous.replace(/^\d{10}_/,'');
+ const select=el('gsi-chart'),previous=requestedChart||select.value,kind=previous.replace(/^\d{10}_/,'').replace(/\.(png|webp)$/,'');
  select.replaceChildren(new Option('Todos os gráficos','all'),new Option('Resumo do ciclo','cycle'),...gallery.map(f=>new Option(chartNames[f.file.replace(/^\d{10}_/,'').replace(/\.(png|webp)$/,'')]||f.title.split(' — ')[0],f.file)),new Option('Histórico completo','history'));
- select.value=gallery.find(f=>f.file.replace(/^\d{10}_/,'')===kind)?.file||(['all','cycle','history'].includes(previous)?previous:'all');
+ requestedChart=null;
+ select.value=gallery.find(f=>f.file.replace(/^\d{10}_/,'').replace(/\.(png|webp)$/,'')===kind)?.file||(['all','cycle','history'].includes(previous)?previous:'all');
  }
 
  const units={ps:'mb',t:'K',uv:'m/s',q:'% q-sat guess',sst:'°C',gps:'nativa'};
@@ -77,7 +81,12 @@
  if(!index){el('gsi-state').className='';el('gsi-state').textContent='Carregando ambiente…';const loaded=await readIndex(env,dataRoot);if(ticket!==loadTicket)return;
  if(![config.label,...(config.aliases||[])].includes(loaded.environment))throw Error('O índice não corresponde ao ambiente '+config.label+'. Confira config.js e a geração dos dados.');
  index=loaded;el('gsi-cycle').replaceChildren(...[...index.cycles].reverse().map(s=>new Option(date(s.cycle)+(s.state!=='parsed'?' · indisponível':s.last_cost===0?' · custo zero':''),s.cycle)));
- el('gsi-cycle').value=[...index.cycles].reverse().find(s=>s.state==='parsed')?.cycle||index.cycles.at(-1)?.cycle||'';
+ const requested=requestedCycle;requestedCycle=null;
+ if(requested&&!index.cycles.some(s=>s.cycle===requested)){
+  el('gsi-state').className='error';el('gsi-state').textContent='O ciclo solicitado pelo link não está disponível. Escolha outro ciclo nos parâmetros.';
+  el('gsi-cycle').value='';el('gsi-cycle').disabled=false;el('gsi-chart').disabled=false;return;
+ }
+ el('gsi-cycle').value=requested||[...index.cycles].reverse().find(s=>s.state==='parsed')?.cycle||index.cycles.at(-1)?.cycle||'';
  el('gsi-snapshot').textContent=`${config.label} · ${index.parsed} de ${index.discovered} ciclos interpretados · extração ${new Date(index.generated_at).toLocaleString('pt-BR',{timeZone:'UTC'})} UTC`;
  }
  if(ticket!==loadTicket)return;

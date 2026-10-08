@@ -6,6 +6,11 @@ const logsKey=()=>window.SMNA_CONFIG.environments[$('environment').value].logsKe
 const products = [{environment:window.SMNA_CONFIG.environments['smna-fn'].sourceKey,name:'SMNA-FNCEP',label:'SMNA-FNCEP'}];
 const selectors = ['date', 'variable', 'level', 'forecast'];
 const cache = new Map();
+const entryParams = new URLSearchParams(location.search);
+let entryMapSelection = location.hash === '#maps' ? {
+ date: entryParams.get('cycle'), variable: entryParams.get('variable'),
+ level: entryParams.get('level'), forecast: entryParams.get('forecast')
+} : null;
 let revision = 0, view = 'status';
 const variableNames = {Zonal_wind_u:'Vento zonal (u)',Meridional_wind_v:'Vento meridional (v)',Omega:'Omega',Stream_function:'Função de corrente',Velocity_potential:'Potencial de velocidade',Geopotential_height:'Altura geopotencial',Absolute_temperature:'Temperatura absoluta',Specific_humidity:'Umidade específica',Vertical_dist_total_cloud_cover:'Cobertura de nuvens',Time_mean_surface_relative_humidity:'Umidade relativa à superfície',Surface_pressure:'Pressão à superfície',Surface_temperature:'Temperatura à superfície',Pressure_reduced_to_msl:'Pressão ao nível do mar','10_metre_u-wind_component':'Vento zonal a 10 m','10_metre_v-wind_component':'Vento meridional a 10 m','Inst._precipitable_water':'Água precipitável'};
 function dateLabel(d){return /^\d{10}$/.test(d)?`${d.slice(6,8)}/${d.slice(4,6)}/${d.slice(0,4)} · ${d.slice(8)} UTC`:d;}
@@ -31,6 +36,7 @@ function setOptions(id, values, label, preferred){const select=$(id),old=preferr
 function clearMaps(text){$('map-grid').replaceChildren(...products.map(product=>{const card=document.createElement('article');card.className='map-card';const heading=document.createElement('h2');heading.textContent=product.label;const frame=document.createElement('div');frame.className='map-frame';const p=document.createElement('p');p.className='image-message';p.textContent=text;frame.append(p);card.append(heading,frame);return card;}));}
 async function loadMaps(start=0){
  const ticket=++revision;
+ const requested=entryMapSelection;entryMapSelection=null;
  for(let i=start;i<selectors.length;i++)$(selectors[i]).disabled=true;
  clearMaps('Consultando disponibilidade…');notice('Consultando os arquivos disponíveis…');
  try{
@@ -42,11 +48,17 @@ async function loadMaps(start=0){
    if(stage===0)values=values.filter(v=>/^\d{10}$/.test(v)).sort().reverse();
    else if(stage===1)values.sort((a,b)=>(variableNames[a]||a).localeCompare(variableNames[b]||b,'pt-BR'));
    else values=values.filter(v=>/^\d+$/.test(v)).sort((a,b)=>stage===2?Number(b)-Number(a):Number(a)-Number(b));
+   const requestedValue=requested?.[selectors[stage]];
+   if(requestedValue&&!values.includes(requestedValue)){
+    for(let i=stage;i<4;i++)setOptions(selectors[i],[],x=>x);
+    clearMaps('A seleção solicitada pelo link não está disponível.');
+    notice('A seleção solicitada pelo link não está disponível. Escolha outra seleção nos parâmetros.',true);return;
+   }
    if(!values.length){for(let i=stage;i<4;i++)setOptions(selectors[i],[],x=>x);clearMaps('Nenhuma imagem publicada para esta seleção.');notice('Não há arquivos para esta seleção. Escolha outra data ou variável.');return;}
    if(stage===0&&start===0)comparisonDates=values.filter(v=>available.every(list=>list.includes(v)));
-   if(stage===3&&start===0&&available.some(list=>!list.length)&&comparisonDates.length>1){comparisonDates.shift();$('date').value=comparisonDates[0];stage=0;continue;}
+   if(!requested&&stage===3&&start===0&&available.some(list=>!list.length)&&comparisonDates.length>1){comparisonDates.shift();$('date').value=comparisonDates[0];stage=0;continue;}
    const label=stage===0?dateLabel:stage===1?(v=>variableNames[v]||v.replaceAll('_',' ')):stage===2?(v=>v):(v=>`${v} horas`);
-   setOptions(selectors[stage],values,label,stage===0&&start===0?(values.find(v=>available.every(list=>list.includes(v)))||values[0]):stage===1&&start===0?'Zonal_wind_u':stage===3&&start===0?(values.find(v=>available.every(list=>list.includes(v)))||values[0]):undefined);
+   setOptions(selectors[stage],values,label,requestedValue??(stage===0&&start===0?(values.find(v=>available.every(list=>list.includes(v)))||values[0]):stage===1&&start===0?'Zonal_wind_u':stage===3&&start===0?(values.find(v=>available.every(list=>list.includes(v)))||values[0]):undefined));
   }
   if(ticket!==revision)return;
   drawMaps(available,ticket);
@@ -272,4 +284,4 @@ $('environment').addEventListener('change',update);
 selectors.forEach((id,i)=>$(id).addEventListener('change',()=>loadMaps(i===3?3:i+1)));
 $('refresh').addEventListener('click',()=>{cache.clear();if(view==='gsi')window.loadGSIDiagnostics(true);else if(view==='bam')window.loadBAMDiagnostics(true);else update();});
 $('close-viewer').addEventListener('click',()=>$('viewer').close());
-window.addEventListener('DOMContentLoaded',()=>{$('environment').value=window.SMNA_CONFIG.defaultEnvironment;if(location.hash==='#bam'){switchView('bam');}else if(location.hash==='#gsi')switchView('gsi');else switchView('status');setInterval(updateNextUpdate,30000);});
+window.addEventListener('DOMContentLoaded',()=>{$('environment').value=Object.hasOwn(window.SMNA_CONFIG.environments,entryParams.get('environment'))?entryParams.get('environment'):window.SMNA_CONFIG.defaultEnvironment;if(location.hash==='#maps'){switchView('maps');}else if(location.hash==='#bam'){switchView('bam');}else if(location.hash==='#gsi')switchView('gsi');else switchView('status');setInterval(updateNextUpdate,30000);});
