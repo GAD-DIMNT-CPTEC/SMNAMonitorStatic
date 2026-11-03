@@ -69,3 +69,11 @@
 .maintenance-banner p{margin:0}
 [data-theme=dark] .maintenance-banner{background:#3c301b;color:#ffe3a3;border-bottom-color:#8a6c2f}
 @media(max-width:650px){.maintenance-banner{align-items:flex-start;padding:12px 16px;font-size:.875rem}}
+
+.site-footer{display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px;margin-top:24px;color:#536372;font-size:.875rem}
+.site-footer p{margin:0}
+.visit-counter{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.visit-counter a{display:inline-flex;align-items:center;min-height:32px}
+.visit-counter img{display:block;height:24px;width:auto;max-width:100%}
+#visit-count-note{font-size:.8125rem}
+[data-theme=dark] .site-footer{color:#b4c4d4}
