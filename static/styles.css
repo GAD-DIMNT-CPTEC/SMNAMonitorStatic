@@ -62,3 +62,10 @@
 #bam h2{font-size:1.2rem;margin-top:28px}.bam-gallery h3{text-align:left;font-weight:700}.bam-glossary th{text-align:left;vertical-align:top}.bam-glossary tbody th{white-space:nowrap}.bam-glossary td{line-height:1.5;text-align:left}
 
 .gsi-mass-spacing{margin-top:1.5rem}
+
+/* Aviso permanente, visível em todas as abas e nos dois modos de leitura. */
+.maintenance-banner{display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 27px;background:#fff3cd;color:#664d03;border-bottom:1px solid #e4ca75;font-size:.9375rem;line-height:1.5}
+.maintenance-banner>span{flex-shrink:0}
+.maintenance-banner p{margin:0}
+[data-theme=dark] .maintenance-banner{background:#3c301b;color:#ffe3a3;border-bottom-color:#8a6c2f}
+@media(max-width:650px){.maintenance-banner{align-items:flex-start;padding:12px 16px;font-size:.875rem}}
