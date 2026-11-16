@@ -4,14 +4,15 @@ const el=id=>document.getElementById(id);
 let dataRoot='',index=null,indexTask=null,request=0,activeEnvironment='';
 const base=()=>new URL(window.SMNA_CONFIG.bamRoot||'bam/',location.href).href.replace(/\/?$/,'/');
 function script(url){return new Promise((resolve,reject)=>{
- const s=document.createElement('script');
- const finish=error=>{clearTimeout(timer);s.onload=null;s.onerror=null;s.remove();error?reject(error):resolve();};
+ const s=document.createElement('script'),done=window.SMNAAvailability.begin(url);
+ const finish=error=>{done(Boolean(error));clearTimeout(timer);s.onload=null;s.onerror=null;s.remove();error?reject(error):resolve();};
  const timer=setTimeout(()=>finish(Error('Não foi possível carregar os diagnósticos BAM deste ambiente.')),30000);
  s.onload=()=>finish();s.onerror=()=>finish(Error('Não foi possível carregar os diagnósticos BAM deste ambiente.'));
  s.src=url;document.head.append(s);
 });}
 function loadIndex(force){if(force)indexTask=null;if(!indexTask)indexTask=script(base()+'index.js?v='+Date.now()).then(()=>{index=window.SMNA_BAM_INDEX;return index;}).catch(e=>{indexTask=null;throw e;});return indexTask;}
 window.loadBAMDiagnostics=async(force=false)=>{
+ window.SMNAAvailability.reset();
  const ticket=++request,root=el('bam'),select=el('bam-cycle');root.replaceChildren();select.disabled=true;
  const env=window.SMNA_CONFIG.environments[el('environment').value].label.toLowerCase();
  if(env!==activeEnvironment){select.replaceChildren();activeEnvironment=env;}
@@ -42,7 +43,7 @@ for(const [label,value] of [['Execução',d.normal_end?'Término normal':'Térmi
 text('p','Os valores globme são acompanhados de desvio-padrão espacial; não representam incerteza temporal. O log não informa tempo de parede, consumo de memória ou CFL. O término normal não garante qualidade física.',root).className='footnote';
 if(!d.figures.length)text('p','O log ainda não contém diagnósticos suficientes para gerar figuras.',root).className='gsi-alert';
 const gallery=document.createElement('div');gallery.className='bam-gallery';root.append(gallery);
-d.figures.filter(f=>f.file!=='steps.png').forEach(f=>{const fig=document.createElement('figure');fig.className='gsi-figure';gallery.append(fig);text('h3',f.title,fig);const b=document.createElement('button');b.className='image-button';b.type='button';b.setAttribute('aria-label','Ampliar '+f.title);fig.append(b);const img=document.createElement('img');img.src=dataRoot+f.file;img.alt=f.title;img.loading='lazy';b.append(img);text('figcaption','Clique para ampliar.',fig);b.onclick=()=>{el('large-image').src=img.src;el('large-image').alt=f.title;el('viewer-title').textContent=f.title;el('original-link').href=img.src;el('viewer').showModal();};});
+d.figures.filter(f=>f.file!=='steps.png').forEach(f=>{const fig=document.createElement('figure');fig.className='gsi-figure';gallery.append(fig);text('h3',f.title,fig);const b=document.createElement('button');b.className='image-button';b.type='button';b.setAttribute('aria-label','Ampliar '+f.title);fig.append(b);const img=document.createElement('img');img.alt=f.title;img.loading='lazy';window.SMNAAvailability.image(img,dataRoot+f.file);b.append(img);text('figcaption','Clique para ampliar.',fig);b.onclick=()=>{el('large-image').src=img.src;el('large-image').alt=f.title;el('viewer-title').textContent=f.title;el('original-link').href=img.src;el('viewer').showModal();};});
 text('h2','Tabelas e rastreabilidade',root);
 table(root,'Médias globais e desvios-padrão',['Validade UTC','Campo','Média','Desvio-padrão','Unidade'],d.global_fields,'global_fields');
 table(root,'Perfis por nível · todos os valores impressos',['Validade UTC','LYR',...d.columns],d.profiles,'profiles');

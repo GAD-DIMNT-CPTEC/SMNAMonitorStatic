@@ -77,3 +77,9 @@
 .visit-counter img{display:block;height:24px;width:auto;max-width:100%}
 #visit-count-note{font-size:.8125rem}
 [data-theme=dark] .site-footer{color:#b4c4d4}
+
+.data-server-notice,#notice.error,#gsi-state.error,.gsi-alert,#maps .image-message.error{font-size:1rem;text-align:left;padding:12px 16px;border:1px solid #d4a72c;border-left:4px solid #b58105;border-radius:4px;background:#fff8df;color:#654b08;line-height:1.5}
+[data-theme=dark] .data-server-notice,[data-theme=dark] #notice.error,[data-theme=dark] #gsi-state.error,[data-theme=dark] .gsi-alert,[data-theme=dark] #maps .image-message.error{background:#352f1d;color:#ffe6a1;border-color:#90752d}
+
+#notice.error::before,#gsi-state.error::before,.gsi-alert::before,#maps .image-message.error::before{content:"⚠ ";}
+#maps .image-message.error{display:block;min-height:0;margin:16px;flex:1}

@@ -11,7 +11,7 @@
  const fmt=(v,d=2)=>v==null?'—':Number(v).toLocaleString('pt-BR',{maximumFractionDigits:d});
  const warning=m=>m.includes('field summaries have mean outside printed min/max')?`${m.split(' ')[0]} estatísticas de campos apresentam média fora do mínimo/máximo impresso; valores preservados para conferência da ponderação ou normalização.`:m;
  const date=c=>`${c.slice(6,8)}/${c.slice(4,6)}/${c.slice(0,4)} ${c.slice(8)}Z`;
- async function read(path,root=dataRoot){const r=await fetch(root+path.replace(/^gsi\//,''),{cache:'no-cache',signal:AbortSignal.timeout(30000)});if(!r.ok)throw Error(`Dados indisponíveis (HTTP ${r.status})`);if(path.endsWith('.gz')){const bytes=new Uint8Array(await r.arrayBuffer());const text=bytes[0]===31&&bytes[1]===139?await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text():new TextDecoder().decode(bytes);return JSON.parse(text);}return r.json();}
+ async function read(path,root=dataRoot){return window.SMNAAvailability.request(root+path.replace(/^gsi\//,''),{cache:'no-cache',signal:AbortSignal.timeout(30000)},async r=>{if(path.endsWith('.gz')){const bytes=new Uint8Array(await r.arrayBuffer());const text=bytes[0]===31&&bytes[1]===139?await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text():new TextDecoder().decode(bytes);return JSON.parse(text);}return r.json();});}
  const localMode=location.protocol==='file:',pendingLocal=new Map();
  function scriptData(path,root=dataRoot){return new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=root+path.replace(/^gsi\//,'');script.onload=()=>{script.remove();resolve();};script.onerror=()=>{script.remove();reject(Error('Arquivo local ausente: '+path+'. Extraia a pasta completa do ZIP.'));};document.head.append(script);});}
  async function localCycle(c,env=activeEnvironment,root=dataRoot){const key=env+':'+c;if(!pendingLocal.has(key)){const task=scriptData(`gsi/local/${c}.js`,root).then(()=>{const data=window.SMNA_GSI_LOCAL[env].cycles[c];delete window.SMNA_GSI_LOCAL[env].cycles[c];return data;}).finally(()=>pendingLocal.delete(key));pendingLocal.set(key,task);}return pendingLocal.get(key);}
@@ -29,14 +29,14 @@
  el('gsi-caption').textContent=history?'Todos os ciclos disponíveis · UTC. Clique para ampliar.':`${figure?.description||'Resumo do ciclo '+date(cycle)+'.'} Clique para ampliar.`;
  el('gsi-image').hidden=false;
  const imagePath=figure?`gsi/plots/${cycle}/${figure.file}`:`gsi/plots/${history?'history':cycle}.png`;
- el('gsi-image').src=dataPath(imagePath)+'?v='+encodeURIComponent(index.generated_at);
+ window.SMNAAvailability.image(el('gsi-image'),dataPath(imagePath)+'?v='+encodeURIComponent(index.generated_at));
  }
  function renderGallery(){
  const container=el('gsi-gallery');container.replaceChildren();
  const heading=document.createElement('h2');heading.textContent=`${gallery.length} gráficos disponíveis · ${date(el('gsi-cycle').value)}`;container.append(heading);
  if(!gallery.length){const note=document.createElement('p');note.textContent='Não há figuras disponíveis para este ciclo.';container.append(note);return;}
  for(const f of gallery){const figure=document.createElement('figure'),title=document.createElement('h3'),button=document.createElement('button'),img=document.createElement('img'),caption=document.createElement('figcaption');
- figure.className='gsi-figure';title.textContent=f.title.split(' — ')[0];button.className='image-button';button.type='button';button.disabled=true;button.setAttribute('aria-label','Ampliar '+f.title);img.alt=f.title;img.loading='lazy';img.src=dataPath(`gsi/plots/${el('gsi-cycle').value}/${f.file}`);caption.textContent=f.description+' Clique para ampliar.';
+ figure.className='gsi-figure';title.textContent=f.title.split(' — ')[0];button.className='image-button';button.type='button';button.disabled=true;button.setAttribute('aria-label','Ampliar '+f.title);img.alt=f.title;img.loading='lazy';window.SMNAAvailability.image(img,dataPath(`gsi/plots/${el('gsi-cycle').value}/${f.file}`));caption.textContent=f.description+' Clique para ampliar.';
  img.addEventListener('load',()=>{button.disabled=false;});img.addEventListener('error',()=>{img.hidden=true;caption.textContent='Imagem não encontrada. Confira se a pasta completa foi extraída.';});button.addEventListener('click',()=>showImageViewer(img.src,img.alt));button.append(img);figure.append(title,button,caption);container.append(figure);}
  }
  const chartNames={convergence:'Minimização',fit:'Ajuste RMS',qc:'Uso e rejeição',profiles:'Perfis verticais',counts:'Contagens finais',radiances:'Radiâncias por satélite',channels:'Canais de radiância',constraints:'Massa e umidade',jterms:'Contribuições de J'};
@@ -49,7 +49,7 @@
 
  const units={ps:'mb',t:'K',uv:'m/s',q:'% q-sat guess',sst:'°C',gps:'nativa'};
  function fits(){const rows=detail?.tables.fits||[],out=[];for(const obs of [...new Set(rows.filter(r=>r.use===el('gsi-use').value).map(r=>r.obs))].sort()){const rr=rows.filter(r=>r.obs===obs&&r.use===el('gsi-use').value).sort((a,b)=>a.evaluation-b.evaluation),a=rr[0],z=rr.at(-1);out.push([obs,units[obs]||a.units,`${a.evaluation} → ${z.evaluation}`,fmt(a.count,0),fmt(z.count,0),a.count>0?fmt(a.rms,4):'—',z.count>0?fmt(z.rms,4):'—',a.count>0?fmt(a.bias,4):'—',z.count>0?fmt(z.bias,4):'—']);}table('gsi-fit',['Variável','Unidade','Avaliações','N inicial','N final','RMS inicial','RMS final','Bias inicial','Bias final'],out);}
- async function cycle(){if(!index||!el('gsi-cycle').value)return;const n=++request,c=el('gsi-cycle').value,s=index.cycles.find(r=>r.cycle===c);detail=null;gallery=[];el('gsi-gallery').replaceChildren();el('gsi-state').className='';el('gsi-state').textContent='Carregando ciclo…';el('gsi-cards').replaceChildren();el('gsi-image').hidden=true;el('gsi-image-link').disabled=true;el('gsi-json').hidden=true;el('gsi-quality').textContent='';el('gsi-warnings').replaceChildren();fits();table('gsi-humidity',[],[]);table('gsi-mass',[],[]);table('gsi-rad',[],[]);table('gsi-channels',[],[]);
+ async function cycle(){window.SMNAAvailability.reset();if(!index||!el('gsi-cycle').value)return;const n=++request,c=el('gsi-cycle').value,s=index.cycles.find(r=>r.cycle===c);detail=null;gallery=[];el('gsi-gallery').replaceChildren();el('gsi-state').className='';el('gsi-state').textContent='Carregando ciclo…';el('gsi-cards').replaceChildren();el('gsi-image').hidden=true;el('gsi-image-link').disabled=true;el('gsi-json').hidden=true;el('gsi-quality').textContent='';el('gsi-warnings').replaceChildren();fits();table('gsi-humidity',[],[]);table('gsi-mass',[],[]);table('gsi-rad',[],[]);table('gsi-channels',[],[]);
  try{if(s.state!=='parsed')throw Error(s.error?.includes('No GSI files')?'Ainda não havia arquivos GSI neste ciclo no momento da extração.':(s.error||'Ciclo não interpretado'));const results=localMode?await localCycle(c).then(x=>[{status:'fulfilled',value:x.detail},{status:'fulfilled',value:x.figures}]):await Promise.allSettled([read(`gsi/cycles/${c}.json.gz`),read(`gsi/plots/${c}/figures.json`)]);if(n!==request)return;
  const [dataResult,figuresResult]=results;gallery=figuresResult.status==='fulfilled'?figuresResult.value.map(f=>({...f,title:f.title.replace(/\bSMNA-FN\b/g,'SMNA-FNCEP').replace(/\bSMNA-FC\b/g,'SMNA-FINPE'),file:f.file||f.png})):[];chartOptions();chart();
  if(dataResult.status!=='fulfilled')throw Error('As figuras disponíveis estão abaixo; não foi possível carregar as tabelas: '+dataResult.reason.message);
@@ -75,6 +75,7 @@
  fits();for(const id of ['gsi-humidity','gsi-mass','gsi-rad','gsi-channels'])table(id,[],[]);
  }
  window.loadGSIDiagnostics=async(force=false)=>{
+ window.SMNAAvailability.reset();
  const ticket=++loadTicket,env=environment(),config=window.SMNA_CONFIG.environments[env];++request;
  if(env!==activeEnvironment||force){reset();activeEnvironment=env;dataRoot=config.gsiRoot.replace(/\/?$/,'/');}
  try{

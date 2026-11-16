@@ -17,9 +17,7 @@ function dateLabel(d){return /^\d{10}$/.test(d)?`${d.slice(6,8)}/${d.slice(4,6)}
 function notice(text, error=false){$('notice').textContent=text;$('notice').classList.toggle('error',error);}
 async function resource(path){
  const hit=cache.get(path); if(hit && Date.now()-hit.time<60000)return hit.value;
- const response=await fetch(BASE+path,{signal:AbortSignal.timeout(15000),cache:'no-cache'});
- if(!response.ok){const e=new Error(`Servidor respondeu HTTP ${response.status}.`);e.status=response.status;throw e;}
- const value={text:await response.text(),modified:response.headers.get('last-modified')};cache.set(path,{time:Date.now(),value});
+ const value=await window.SMNAAvailability.request(BASE+path,{signal:AbortSignal.timeout(15000),cache:'no-cache'},async response=>({text:await response.text(),modified:response.headers.get('last-modified')}));cache.set(path,{time:Date.now(),value});
  let cachedBytes=0;for(const item of cache.values())cachedBytes+=item.value.text.length*2;
  while(cache.size>1&&(cache.size>60||cachedBytes>16*1024*1024)){const key=cache.keys().next().value;cachedBytes-=cache.get(key).value.text.length*2;cache.delete(key);}
  return value;
@@ -33,8 +31,9 @@ async function listing(path, files=false){
 }
 function path(product, depth=3){const parts=[product.environment,product.name,...selectors.slice(0,depth).map(id=>$(id).value)];return parts.map(encodeURIComponent).join('/')+'/';}
 function setOptions(id, values, label, preferred){const select=$(id),old=preferred??select.value;select.replaceChildren(...values.map(v=>new Option(label(v),v)));if(values.includes(old))select.value=old;select.disabled=!values.length;}
-function clearMaps(text){$('map-grid').replaceChildren(...products.map(product=>{const card=document.createElement('article');card.className='map-card';const heading=document.createElement('h2');heading.textContent=product.label;const frame=document.createElement('div');frame.className='map-frame';const p=document.createElement('p');p.className='image-message';p.textContent=text;frame.append(p);card.append(heading,frame);return card;}));}
+function clearMaps(text,error=false){$('map-grid').replaceChildren(...products.map(product=>{const card=document.createElement('article');card.className='map-card';const heading=document.createElement('h2');heading.textContent=product.label;const frame=document.createElement('div');frame.className='map-frame';const p=document.createElement('p');p.className=error?'image-message error':'image-message';p.textContent=text;frame.append(p);card.append(heading,frame);return card;}));}
 async function loadMaps(start=0){
+ window.SMNAAvailability.reset();
  const ticket=++revision;
  const requested=entryMapSelection;entryMapSelection=null;
  for(let i=start;i<selectors.length;i++)$(selectors[i]).disabled=true;
@@ -63,7 +62,7 @@ async function loadMaps(start=0){
   if(ticket!==revision)return;
   drawMaps(available,ticket);
   notice(`${dateLabel($('date').value)} · ${variableNames[$('variable').value]||$('variable').value} · Nível ${$('level').value} · +${$('forecast').value} h`);
- }catch(e){if(ticket!==revision)return;clearMaps('Não foi possível consultar as imagens.');notice('Não foi possível carregar a imagem deste ambiente.',true);}
+ }catch(e){if(ticket!==revision)return;clearMaps('Não foi possível consultar as imagens.',true);notice('Não foi possível carregar a imagem deste ambiente.',true);}
 }
 function showImageViewer(url,description){
  $('viewer-title').textContent=description;$('large-image').src=url;$('large-image').alt=description;$('original-link').href=url;$('viewer').showModal();
@@ -86,14 +85,14 @@ function drawMaps(available,ticket){
   const imageButton=document.createElement('button');imageButton.className='image-button';imageButton.setAttribute('aria-label',`Ampliar ${description}`);
   const link=document.createElement('a');link.href=url;link.target='_blank';link.rel='noopener';link.textContent='Abrir original ↗';
   const timer=setTimeout(()=>{
-   img.onload=null;img.onerror=null;img.removeAttribute('src');
+   stopWatching(true);img.onload=null;img.onerror=null;img.removeAttribute('src');
    if(ticket!==revision)return;
-   message.textContent='Não foi possível carregar a imagem deste ambiente.';frame.replaceChildren(message);
+   message.classList.add('error');message.textContent='Não foi possível carregar a imagem deste ambiente.';frame.replaceChildren(message);
   },30000);
   img.onload=()=>{clearTimeout(timer);if(ticket!==revision)return;imageButton.append(img);frame.replaceChildren(imageButton);bottom.append(link);};
-  img.onerror=()=>{clearTimeout(timer);if(ticket!==revision)return;message.textContent='Imagem indisponível no momento. Atualize para tentar novamente.';frame.replaceChildren(message);};
+  img.onerror=()=>{clearTimeout(timer);if(ticket!==revision)return;message.classList.add('error');message.textContent='Imagem indisponível no momento. Atualize para tentar novamente.';frame.replaceChildren(message);};
   imageButton.addEventListener('click',()=>{showImageViewer(url,description);});
-  img.src=url;
+  const stopWatching=window.SMNAAvailability.image(img,url);
  });
 }
 function parseCSV(text){
@@ -265,6 +264,7 @@ function update(){
  if(view==='bam'){++revision;notice('');window.loadBAMDiagnostics();}else if(view==='gsi'){++revision;notice('');window.loadGSIDiagnostics();}else if(view==='maps')loadMaps();else if(view==='status')loadStatus();else if(view==='logs')loadLogs();else if(view==='obs')loadObservations();else {++revision;notice('');}
 }
 function switchView(next){
+ window.SMNAAvailability.reset();
  view=next;
  for(const name of ['maps','status','logs','obs','gsi','bam','about']){
   $(name).hidden=next!==name;
