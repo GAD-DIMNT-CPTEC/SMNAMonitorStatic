@@ -3,7 +3,13 @@
 const el=id=>document.getElementById(id);
 let dataRoot='',index=null,indexTask=null,request=0,activeEnvironment='';
 const base=()=>new URL(window.SMNA_CONFIG.bamRoot||'bam/',location.href).href.replace(/\/?$/,'/');
-function script(url){return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=url;s.onload=()=>{s.remove();resolve();};s.onerror=()=>{s.remove();reject(Error('Não foi possível carregar os diagnósticos BAM deste ambiente.'));};document.head.append(s);});}
+function script(url){return new Promise((resolve,reject)=>{
+ const s=document.createElement('script');
+ const finish=error=>{clearTimeout(timer);s.onload=null;s.onerror=null;s.remove();error?reject(error):resolve();};
+ const timer=setTimeout(()=>finish(Error('Não foi possível carregar os diagnósticos BAM deste ambiente.')),30000);
+ s.onload=()=>finish();s.onerror=()=>finish(Error('Não foi possível carregar os diagnósticos BAM deste ambiente.'));
+ s.src=url;document.head.append(s);
+});}
 function loadIndex(force){if(force)indexTask=null;if(!indexTask)indexTask=script(base()+'index.js?v='+Date.now()).then(()=>{index=window.SMNA_BAM_INDEX;return index;}).catch(e=>{indexTask=null;throw e;});return indexTask;}
 window.loadBAMDiagnostics=async(force=false)=>{
  const ticket=++request,root=el('bam'),select=el('bam-cycle');root.replaceChildren();select.disabled=true;

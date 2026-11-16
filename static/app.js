@@ -85,7 +85,11 @@ function drawMaps(available,ticket){
   const img=new Image();img.alt=description;img.decoding='async';
   const imageButton=document.createElement('button');imageButton.className='image-button';imageButton.setAttribute('aria-label',`Ampliar ${description}`);
   const link=document.createElement('a');link.href=url;link.target='_blank';link.rel='noopener';link.textContent='Abrir original ↗';
-  const timer=setTimeout(()=>{if(ticket===revision && !img.complete)message.textContent='O servidor está demorando a enviar a imagem. Aguarde ou atualize a disponibilidade.';},15000);
+  const timer=setTimeout(()=>{
+   img.onload=null;img.onerror=null;img.removeAttribute('src');
+   if(ticket!==revision)return;
+   message.textContent='Não foi possível carregar a imagem deste ambiente.';frame.replaceChildren(message);
+  },30000);
   img.onload=()=>{clearTimeout(timer);if(ticket!==revision)return;imageButton.append(img);frame.replaceChildren(imageButton);bottom.append(link);};
   img.onerror=()=>{clearTimeout(timer);if(ticket!==revision)return;message.textContent='Imagem indisponível no momento. Atualize para tentar novamente.';frame.replaceChildren(message);};
   imageButton.addEventListener('click',()=>{showImageViewer(url,description);});
